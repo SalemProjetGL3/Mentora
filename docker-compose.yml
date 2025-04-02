@@ -1,0 +1,43 @@
+version: "3.8"
+
+services:
+  mongo:
+    image: mongo:5.0
+    container_name: mentora_mongo
+    ports:
+      - "27017:27017"
+    volumes:
+      - mongo_data:/data/db
+
+  auth-service:
+    build: ./auth-service
+    container_name: auth_service
+    ports:
+      - "3001:3000"
+    environment:
+      - MONGO_URI=mongodb://mongo:27017/mentoraDB
+    depends_on:
+      - mongo
+
+  user-service:
+    build: ./user-service
+    container_name: user_service
+    ports:
+      - "3002:3000"
+    environment:
+      - MONGO_URI=mongodb://mongo:27017/mentoraDB
+    depends_on:
+      - mongo
+
+  course-service:
+    build: ./course-service
+    container_name: course_service
+    ports:
+      - "3003:3000"
+    environment:
+      - MONGO_URI=mongodb://mongo:27017/mentoraDB
+    depends_on:
+      - mongo
+
+volumes:
+  mongo_data:
