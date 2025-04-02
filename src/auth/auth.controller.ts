@@ -1,4 +1,4 @@
-import { Controller, Post, Body, UseGuards, Request } from '@nestjs/common';
+import { Controller, Post, Body, UseGuards, Request, Query, Get } from '@nestjs/common';
 import { AuthService } from './auth.service';
 import { LocalAuthGuard } from './guards/local-auth.guard'; // Used for validating user credentials
 import { CreateUserDto } from '../users/dto/create-user.dto'; // Importing DTO for registration
@@ -16,7 +16,12 @@ export class AuthController {
 
   // Register endpoint (Requires CreateUserDto)
   @Post('register')
-  async register(@Body() createUserDto: CreateUserDto) {
-    return this.authService.register(createUserDto);
+  async register(@Body() body: { email: string; password: string; username: string }) {
+    return this.authService.register(body.email, body.password, body.username);
+  }
+
+  @Get('verify-email')
+  async verifyEmail(@Query('token') token: string) {
+    return this.authService.verifyEmail(token);
   }
 }

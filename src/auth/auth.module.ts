@@ -10,6 +10,7 @@ import { UsersModule } from '../users/user.module';
 import { LocalStrategy } from './strategies/local.strategy';
 import { SessionMiddleware } from './middlewares/session.middleware';
 import { SessionSerializer } from './session.serializer';
+import { MailerModule } from '../mailer/mailer.module';
 
 @Module({
   imports: [
@@ -35,6 +36,7 @@ import { SessionSerializer } from './session.serializer';
       inject: [ConfigService],
     }), 
     UsersModule,
+    MailerModule
   ],
   providers: [AuthService, LocalStrategy, JwtStrategy, SessionSerializer],
   controllers: [AuthController],
