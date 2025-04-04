@@ -12,7 +12,7 @@ import { ConfigModule, ConfigService } from '@nestjs/config';
     ConfigModule.forRoot({
       isGlobal: true,
       envFilePath: [
-        join(__dirname, '../../.env'),
+        join(__dirname, '../../../.env'),
         join(__dirname, '../.env'),
       ]
     }),
@@ -20,7 +20,7 @@ import { ConfigModule, ConfigService } from '@nestjs/config';
     // Connect to MongoDB with URI from .env
     MongooseModule.forRootAsync({
       useFactory: (configService: ConfigService) => ({
-        uri: configService.get<string>('MONGODB_URI'), // Load MongoDB URI from .env
+        uri: configService.get<string>('MONGO_URI'), // Load MongoDB URI from .env
       }),
       inject: [ConfigService],
     }),
