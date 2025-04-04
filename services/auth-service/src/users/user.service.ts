@@ -14,22 +14,15 @@ export class UsersService {
   // Register a new user
   async create(createUserDto: CreateUserDto): Promise<User> {
     console.log('🔹 Received CreateUserDto in UsersService:', createUserDto);
-    
-    // Check if the user already exists
-    const userExists = await this.userModel.findOne({ email: createUserDto.email });
-    if (userExists) {
-      throw new Error('User with this email already exists.');
-    }
 
     // Hash the password before saving
-    console.log('Password : ', createUserDto.password);
-    const hashedPassword = await bcrypt.hash(createUserDto.password, 10);
-    const isMatched = await bcrypt.compare('password123', hashedPassword);
+    console.log('[USER] Received Hashed Password : ', createUserDto.password);
+    const isMatched = await bcrypt.compare('password123', createUserDto.password);
     console.log('Password matched : ', isMatched);
 
     const createdUser = new this.userModel({
       ...createUserDto,
-      password: hashedPassword,
+      password: createUserDto.password,
     });
 
     return createdUser.save();
@@ -58,6 +51,10 @@ export class UsersService {
 
   async updateVerificationToken(email: string, token: string) {
     return this.userModel.updateOne({ email }, { verificationToken: token });
+  }
+
+  async deleteUser(email: string) {
+    return this.userModel.deleteOne({ email });
   }
   
 }

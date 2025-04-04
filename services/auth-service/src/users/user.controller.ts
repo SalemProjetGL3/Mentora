@@ -23,4 +23,10 @@ export class UsersController {
   async findByEmail(@Param('email') email: string) {
     return this.usersService.findOneByEmail(email);
   }
+
+  @Get('delete/:email')
+  async deleteUser(@Param('email') email: string) {
+    return this.usersService.deleteUser(email);
+  }
+  
 }
