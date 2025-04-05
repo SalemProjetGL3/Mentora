@@ -13,6 +13,9 @@ export class Progress extends Document {
   @Prop({ type: [String], default: [] })
   completedLessons: string[];
 
+  @Prop({ type: [String], default: [] })
+  completedAssessments: string[];
+
   // Taux de progression (0-100)
   @Prop({ default: 0 })
   progressRate: number;

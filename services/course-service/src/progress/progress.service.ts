@@ -33,6 +33,8 @@ export class ProgressService {
         userId,
         courseId,
         startedAt: new Date(),
+        completedLessons: [],
+        completedAssessments: [],
       });
     }
 
@@ -43,26 +45,36 @@ export class ProgressService {
       }
     }
 
+    // Ajouter l'évaluation (quiz) terminée
+    if (dto.completedAssessmentId) {
+      if (!progress.completedAssessments.includes(dto.completedAssessmentId)) {
+        progress.completedAssessments.push(dto.completedAssessmentId);
+      }
+    }
+
     // Recalcul du taux de progression
     const course = await this.courseModel.findById(courseId).exec();
     if (!course) {
       throw new NotFoundException(`Course #${courseId} not found`);
     }
 
-    const totalLessons = course.lessons.length;
-    const completedCount = progress.completedLessons.length;
-
+    const totalUnits = course.lessons.reduce((acc, lesson) => {
+      return acc + 1 + (lesson.quizId ? 1 : 0);
+    }, 0);
+  
+    // Les unités complétées sont celles des leçons et des évaluations
+    const completedUnits = progress.completedLessons.length + progress.completedAssessments.length;
+  
     let newRate = 0;
-    if (totalLessons > 0) {
-      newRate = Math.round((completedCount / totalLessons) * 100);
+    if (totalUnits > 0) {
+      newRate = Math.round((completedUnits / totalUnits) * 100);
     }
-
     progress.progressRate = newRate;
-
+  
     if (newRate === 100 && !progress.finishedAt) {
       progress.finishedAt = new Date();
     }
-
+  
     await progress.save();
     return progress;
   }

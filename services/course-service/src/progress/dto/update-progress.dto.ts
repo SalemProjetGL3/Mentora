@@ -5,4 +5,8 @@ export class UpdateProgressDto {
   @IsOptional()
   @IsString()
   completedLessonId?: string;
+
+  @IsOptional()
+  @IsString()
+  completedAssessmentId?: string;
 }
