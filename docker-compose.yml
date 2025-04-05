@@ -50,7 +50,7 @@ services:
       DB_HOST: mysql
       DB_PORT: ${DB_PORT}       # Assurez-vous que DB_PORT est défini (par défaut 3306)
       DB_USERNAME: ${DB_USERNAME}
-      DB_PASSWORD: ${DB_PASSWORD}
+      DB_PASSWORD: ${MYSQL_ROOT_PASSWORD}
       DB_NAME: ${DB_NAME}
     depends_on:
       - mysql

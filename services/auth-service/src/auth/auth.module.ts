@@ -3,7 +3,6 @@ import { AuthService } from './auth.service';
 import { AuthController } from './auth.controller';
 import { PassportModule } from '@nestjs/passport';
 import { JwtModule } from '@nestjs/jwt';
-import { MongooseModule } from '@nestjs/mongoose';
 import { ConfigModule, ConfigService } from '@nestjs/config';
 import { JwtStrategy } from './strategies/jwt-auth.strategy';
 import { UsersModule } from '../users/user.module';
@@ -14,17 +13,6 @@ import { MailerModule } from '../mailer/mailer.module';
 
 @Module({
   imports: [
-    // Load environment variables
-    ConfigModule.forRoot({ isGlobal: true }),
-
-    // Connect to MongoDB with URI from .env
-    MongooseModule.forRootAsync({
-      useFactory: (configService: ConfigService) => ({
-        uri: configService.get<string>('MONGODB_URI'), // Load MongoDB URI from .env
-      }),
-      inject: [ConfigService],
-    }),
-
     // ConfigModule,
     PassportModule.register({ session: true }),
     JwtModule.registerAsync({

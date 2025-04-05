@@ -1,8 +1,7 @@
 import { Injectable } from '@nestjs/common';
 import { UsersService } from '../users/user.service';
-import { CreateUserDto } from '../users/dto/create-user.dto';
 import { JwtService } from '@nestjs/jwt';
-import { BadRequestException, UnauthorizedException } from '@nestjs/common/exceptions';
+import { BadRequestException } from '@nestjs/common/exceptions';
 import * as bcrypt from 'bcrypt';
 import { ConfigService } from '@nestjs/config';
 import { MailerService } from '../mailer/mailer.service';
@@ -18,29 +17,27 @@ export class AuthService {
 
   // Register user
   async register(email: string, password: string, username: string) {
+    // Check if user already exists
     const existingUser = await this.usersService.findOneByEmail(email);
     if (existingUser) throw new BadRequestException('Email already in use');
 
+    // Generate verification token
     const verificationToken = this.jwtService.sign(
       { email },
       { secret: this.configService.get('JWT_SECRET'), expiresIn: '1d' },
     );
-    console.log({
-      email : email,
-      username : username,
-      password : password,
-      isVerified: false,
-      verificationToken,
-    });
+
+    // Hash the password and create user
+    const hashedPassword = await bcrypt.hash(password, 10);
     const user = await this.usersService.create({
       email : email,
       username : username,
-      password : password,
+      password : hashedPassword,
       isVerified: false,
       verificationToken,
     });
 
-    // Send email
+    // Send verification email
     await this.sendVerificationEmailToUser(user.email, verificationToken);
 
     return { message: 'Registration successful. Please check your email.' };
@@ -85,14 +82,7 @@ export class AuthService {
   }
 
   // Login user
-  async login(creds: any) {
-    const email = creds.email;
-    const password = creds.password;
-    console.log(`Attempting login for email: ${email}`);
-  
-    const user = await this.validateUser(email, password);
-    console.log('User found:', user);
-
+  async login(user: any) {
     if (!user) {
       return { message: 'Invalid credentials or user not found.' };
     }
@@ -123,9 +113,8 @@ export class AuthService {
     }
     
     const isMatch = await bcrypt.compare(password, user.password);
-    console.log('Password match:', isMatch);
     if (user && isMatch) {
-      console.log('User is verified:', user.isVerified);
+      console.log('[validateUser] User is verified:', user.isVerified);
       return user; // Return the user only if they are verified
     }
     return null;
