@@ -1,0 +1,61 @@
+# version: "3.8"
+
+services:
+  mongo:
+    image: mongo:5.0
+    container_name: mentora_mongo
+    ports:
+      - "27017:27017"
+    volumes:
+      - mongo_data:/data/db
+
+  mysql:
+    image: mysql:8.0
+    container_name: mentora_mysql
+    restart: always
+    environment:
+      MYSQL_ROOT_PASSWORD: ${MYSQL_ROOT_PASSWORD}   # Ajoutez cette variable
+      MYSQL_DATABASE: ${DB_NAME}                      # Votre base de données
+    ports:
+      - "3306:3306"
+    volumes:
+      - mysql_data:/var/lib/mysql
+
+  auth-service:
+    build: ./services/auth-service
+    container_name: auth_service
+    ports:
+      - "3001:3000"
+    environment:
+      - MONGO_URI=${MONGO_URI}
+    depends_on:
+      - mongo
+
+  course-service:
+    build: ./services/course-service
+    container_name: course_service
+    ports:
+      - "3003:3000"
+    environment:
+      - MONGO_URI=${MONGO_URI}
+    depends_on:
+      - mongo
+
+  user-service:
+    build: ./services/user-service
+    container_name: user_service
+    ports:
+      - "3002:3000"
+    environment:
+      DB_HOST: mysql
+      DB_PORT: ${DB_PORT}
+      DB_USERNAME: ${DB_USERNAME}
+      DB_PASSWORD: ${MYSQL_ROOT_PASSWORD}
+      DB_NAME: ${DB_NAME}
+    depends_on:
+      - mysql
+
+
+volumes:
+  mongo_data:
+  mysql_data:
