@@ -13,4 +13,10 @@ export class CreateUserInput {
 
   @Field({ nullable: true, defaultValue: 'USER' })
   role?: string;
+
+  @Field({ nullable: true, defaultValue: false })
+  isVerified?: boolean;
+
+  @Field({ nullable: true })
+  verificationToken?: string;
 }

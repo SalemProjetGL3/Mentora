@@ -26,4 +26,12 @@ export class User {
     default: 'USER'
   })
   role: string;
+  
+  @Field()
+  @Column({ default: false })
+  isVerified: boolean;
+
+  @Field({ nullable: true })
+  @Column({ nullable: true })
+  verificationToken: string;
 }
