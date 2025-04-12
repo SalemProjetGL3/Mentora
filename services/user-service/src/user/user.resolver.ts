@@ -32,4 +32,20 @@ export class UserResolver {
   async removeUser(@Args('id', { type: () => ID }) id: number): Promise<boolean> {
     return this.userService.remove(id);
   }
+
+  @Mutation(() => User)
+  async enrollUserInCourse(
+    @Args('userId', { type: () => ID }) userId: number,
+    @Args('courseId') courseId: string
+  ): Promise<User> {
+    return this.userService.enrollInCourse(userId, courseId);
+  }
+
+  @Mutation(() => User)
+  async unenrollUserFromCourse(
+    @Args('userId', { type: () => ID }) userId: number,
+    @Args('courseId') courseId: string
+  ): Promise<User> {
+    return this.userService.unenrollFromCourse(userId, courseId);
+  }
 }

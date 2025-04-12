@@ -1,4 +1,4 @@
-import { Injectable } from '@nestjs/common';
+import { Injectable, NotFoundException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { User } from './user.entity';
@@ -41,5 +41,45 @@ export class UserService {
   async remove(id: number): Promise<boolean> {
     const result = await this.userRepository.delete(id);
     return (result.affected ?? 0) > 0;
+  }
+
+  async enrollInCourse(userId: number, courseId: string): Promise<User> {
+    const user = await this.userRepository.findOne({ where: { id: userId } });
+    if (!user) {
+      throw new NotFoundException(`User with ID ${userId} not found`);
+    }
+
+    if (!user.enrolledCourseIds) {
+      user.enrolledCourseIds = [];
+    }
+
+    if (!user.enrolledCourseIds.includes(courseId)) {
+      user.enrolledCourseIds.push(courseId);
+      await this.userRepository.save(user);
+    }
+
+    return user;
+  }
+
+  async unenrollFromCourse(userId: number, courseId: string): Promise<User> {
+    const user = await this.userRepository.findOne({ where: { id: userId } });
+    if (!user) {
+      throw new NotFoundException(`User with ID ${userId} not found`);
+    }
+
+    if (user.enrolledCourseIds) {
+      user.enrolledCourseIds = user.enrolledCourseIds.filter(id => id !== courseId);
+      await this.userRepository.save(user);
+    }
+
+    return user;
+  }
+
+  async getUserEnrolledCourses(userId: number): Promise<string[]> {
+    const user = await this.userRepository.findOne({ where: { id: userId } });
+    if (!user) {
+      throw new NotFoundException(`User with ID ${userId} not found`);
+    }
+    return user.enrolledCourseIds || [];
   }
 }
