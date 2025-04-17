@@ -2,7 +2,7 @@ import { Injectable } from '@nestjs/common';
 import { UsersService } from '../users/user.service';
 import { JwtService } from '@nestjs/jwt';
 import { BadRequestException } from '@nestjs/common/exceptions';
-import * as bcrypt from 'bcrypt';
+import * as bcrypt from 'bcryptjs';
 import { ConfigService } from '@nestjs/config';
 import { MailerService } from '../mailer/mailer.service';
 
