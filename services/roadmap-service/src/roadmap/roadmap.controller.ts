@@ -10,7 +10,8 @@ export class RoadmapController {
 
   @Post()
   async createRoadmap(@Body() createRoadmapDto: CreateRoadmapDto, @Req() req): Promise<any> {
-    const userId = req.user.id;
+    // const userId = req.user.id;
+    const userId = "1"
     return this.roadmapService.createRoadmap(createRoadmapDto, userId);
   }
 }

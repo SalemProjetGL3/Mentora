@@ -14,8 +14,8 @@ services:
     container_name: mentora_mysql
     restart: always
     environment:
-      MYSQL_ROOT_PASSWORD: ${MYSQL_ROOT_PASSWORD}   # Ajoutez cette variable
-      MYSQL_DATABASE: ${DB_NAME}                      # Votre base de données
+      MYSQL_ROOT_PASSWORD: ${MYSQL_ROOT_PASSWORD}  
+      MYSQL_DATABASE: ${DB_NAME}                      
     ports:
       - "3306:3306"
     volumes:
@@ -28,16 +28,6 @@ services:
       - ./services/auth-service/.env
     ports:
       - "3001:3000"
-    environment:
-      - MONGO_URI=${MONGO_URI}
-    depends_on:
-      - mongo
-
-  course-service:
-    build: ./services/course-service
-    container_name: course_service
-    ports:
-      - "3003:3000"
     environment:
       - MONGO_URI=${MONGO_URI}
     depends_on:
@@ -57,6 +47,27 @@ services:
     depends_on:
       - mysql
 
+  course-service:
+    build: ./services/course-service
+    container_name: course_service
+    ports:
+      - "3003:3000"
+    environment:
+      - MONGO_URI=${MONGO_URI}
+    depends_on:
+      - mongo
+
+  roadmap-service:
+    build: ./services/roadmap-service
+    container_name: roadmap_service
+    env_file:
+      - ./services/roadmap-service/.env
+    ports:
+      - "3004:3000"
+    environment:
+      - MONGO_URI=${MONGO_URI}
+    depends_on:
+      - mongo
 
 volumes:
   mongo_data:
