@@ -1,5 +1,5 @@
 // src/progress/progress.controller.ts
-import { Controller, Get, Patch, Param, Body } from '@nestjs/common';
+import { Controller, Get, Patch, Post, Param, Body } from '@nestjs/common';
 import { ProgressService } from './progress.service';
 import { UpdateProgressDto } from './dto/update-progress.dto';
 
@@ -23,4 +23,10 @@ export class ProgressController {
   ) {
     return this.progressService.updateProgress(userId, courseId, dto);
   }
+
+  @Post('init')
+  async initProgress(@Body() dto: { userId: string; courseId: string }) {
+    return this.progressService.initProgress(dto.userId, dto.courseId);
+  }
+
 }

@@ -4,12 +4,15 @@ import { Repository } from 'typeorm';
 import { User } from './user.entity';
 import { CreateUserInput } from './dto/create-user.input';
 import { UpdateUserInput } from './dto/update-user.input';
+import { firstValueFrom } from 'rxjs';
+import { HttpService } from '@nestjs/axios';
 
 @Injectable()
 export class UserService {
   constructor(
     @InjectRepository(User)
     private userRepository: Repository<User>,
+    private readonly http: HttpService, // Assuming HttpService is imported from '@nestjs/axios'
   ) {}
 
   async create(createUserInput: CreateUserInput): Promise<User> {
@@ -56,6 +59,14 @@ export class UserService {
     if (!user.enrolledCourseIds.includes(courseId)) {
       user.enrolledCourseIds.push(courseId);
       await this.userRepository.save(user);
+    }
+
+    try {
+      await firstValueFrom(
+        this.http.post('/progress/init', { userId: userId.toString(), courseId }),
+      );
+    } catch (err) {
+      console.error('Cannot initialize progress:', err.message);
     }
 
     return user;

@@ -78,4 +78,21 @@ export class ProgressService {
     await progress.save();
     return progress;
   }
+
+  async initProgress(userId: string, courseId: string): Promise<Progress> {
+    let progress = await this.progressModel.findOne({ userId, courseId }).exec();
+    if (!progress) {
+      progress = new this.progressModel({
+        userId,
+        courseId,
+        completedLessons: [],
+        completedAssessments: [],
+        progressRate: 0,
+        startedAt: new Date(),
+      });
+      await progress.save();
+    }
+    return progress;
+  }
+  
 }
