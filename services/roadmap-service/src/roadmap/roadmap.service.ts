@@ -9,22 +9,34 @@ import { CreateRoadmapDto } from './dto/create-roadmap.dto';
 export class RoadmapService {
   constructor(
     @InjectModel(Roadmap.name) private roadmapModel: Model<RoadmapDocument>,
-  ) {}
+  ) {
+    console.log('→ Python API URL =', process.env.API_URL);
+  }
+
 
   async generateExternalRoadmap(prompt: string): Promise<any> {
-    const pythonApiUrl = process.env.API_URL;
-    const endpoint = `${pythonApiUrl}/generate_roadmap`;
+    const endpoint = `${process.env.API_URL}/generate_roadmap`;
+    console.log('→ Calling Python API at', endpoint, 'with prompt:', prompt);
+  
     try {
-      const response = await axios.post(endpoint, { prompt });
-      if (response.data && response.data.roadmap) {
-        return response.data.roadmap;
+      const { data, status } = await axios.post(endpoint, { prompt });
+      return data;
+    } catch (err: any) {
+      if (err.response) {
+        throw new BadRequestException(
+          `Python API ${err.response.status}: ${JSON.stringify(err.response.data)}`
+        );
+      } else if (err.request) {
+          throw new BadRequestException(
+            'Aucune réponse de l’API Python (vérifiez l’URL et le réseau).'
+          );
       } else {
-        throw new BadRequestException("La roadmap n'a pas pu être générée.");
+          throw new BadRequestException('Erreur Axios: ' + err.message);
       }
-    } catch (error) {
-      throw new BadRequestException("Erreur lors de l'appel à l'API Python: " + error.message);
     }
   }
+  
+  
 
   async createRoadmap(createRoadmapDto: CreateRoadmapDto, userId: string): Promise<Roadmap> {
     const { prompt } = createRoadmapDto;
