@@ -1,17 +1,20 @@
 import { Injectable, NestMiddleware } from '@nestjs/common';
 import * as session from 'express-session';
+import { ConfigService } from '@nestjs/config';
+
 
 @Injectable()
 export class SessionMiddleware implements NestMiddleware {
+  constructor(private readonly configService: ConfigService) {}
+
   use(req: any, res: any, next: () => void) {
-    // Set up the session middleware
     session({
-      secret: 'your-secret-key', // Use an environment variable for secret
+      secret: this.configService.get<string>('session.secret'), 
       resave: false,
       saveUninitialized: false,
       cookie: {
         httpOnly: true,
-        maxAge: 3600000, // Session will expire in 1 hour
+        maxAge: 3600000, 
       },
     })(req, res, next);
   }
