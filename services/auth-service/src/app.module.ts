@@ -5,6 +5,7 @@ import { AuthModule } from './auth/auth.module';
 import { join } from 'path';
 import { MongooseModule } from '@nestjs/mongoose';
 import { ConfigModule, ConfigService } from '@nestjs/config';
+import sessionConfig from './auth/config/session.config';
 
 @Module({
   imports: [
@@ -14,7 +15,8 @@ import { ConfigModule, ConfigService } from '@nestjs/config';
       envFilePath: [
         join(__dirname, '../../../.env'),
         join(__dirname, '../.env'),
-      ]
+      ],
+      load: [sessionConfig],
     }),
 
     // Connect to MongoDB with URI from .env

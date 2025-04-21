@@ -11,7 +11,7 @@ import { join } from 'path';
   imports: [
     ConfigModule.forRoot({
       isGlobal: true,
-      envFilePath: join(__dirname, '../../.env'),
+      envFilePath: join(__dirname, '../../../.env'),
     }),
     TypeOrmModule.forRootAsync({
       imports: [ConfigModule],
