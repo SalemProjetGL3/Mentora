@@ -8,6 +8,7 @@ import { ConfigModule, ConfigService } from '@nestjs/config';
 import { join } from 'path';
 import { EventEmitterModule } from '@nestjs/event-emitter';
 import { UserRewards, UserRewardsSchema } from './points/schemas/user-rewards.schema';
+import { ShopModule } from './shop/shop.module';
 
 @Module({
   imports: [PointsModule, 
@@ -24,6 +25,7 @@ import { UserRewards, UserRewardsSchema } from './points/schemas/user-rewards.sc
         inject: [ConfigService],
       }),
       EventEmitterModule.forRoot(),
+      ShopModule,
   ],
   controllers: [AppController],
   providers: [AppService],
