@@ -6,9 +6,14 @@ import * as passport from 'passport';
 
 async function bootstrap() {
   const app = await NestFactory.create(AppModule);
+
+  app.enableCors({
+    origin: process.env.REACT_APP_URL, 
+    credentials: true, 
+  });
   
   const configService = app.get(ConfigService);
-  const sessionSecret = configService.get<string>('SESSION_SECRET') || 'defaultSecret'; // Use a strong secret
+  const sessionSecret = configService.get<string>('SESSION_SECRET'); 
 
   // Enable session middleware
   app.use(
@@ -16,7 +21,7 @@ async function bootstrap() {
       secret: sessionSecret,
       resave: false, 
       saveUninitialized: false,
-      cookie: { secure: false }, // Set to `true` if using HTTPS
+      cookie: { secure: false }, 
     }),
   );
 

@@ -8,7 +8,7 @@ import { JwtStrategy } from './strategies/jwt-auth.strategy';
 import { UsersModule } from '../users/user.module';
 import { LocalStrategy } from './strategies/local.strategy';
 import { SessionMiddleware } from './middlewares/session.middleware';
-import { SessionSerializer } from './session.serializer';
+import { SessionSerializer } from './serializers/session.serializer';
 import { MailerModule } from '../mailer/mailer.module';
 
 @Module({
@@ -23,6 +23,7 @@ import { MailerModule } from '../mailer/mailer.module';
       }),
       inject: [ConfigService],
     }), 
+
     UsersModule,
     MailerModule
   ],

@@ -1,60 +1,58 @@
 import { Injectable } from '@nestjs/common';
-import { CreateUserDto } from './dto/create-user.dto';
-import { User } from './interfaces/user.interface';
+import { InjectRepository } from '@nestjs/typeorm';
+import { Repository } from 'typeorm';
 import * as bcrypt from 'bcryptjs';
-import { InjectModel } from '@nestjs/mongoose'; // MongoDB integration
-import { Model } from 'mongoose'; // MongoDB integration
+import { CreateUserDto } from './dto/create-user.dto';
+import { User } from './user.entity'; 
 
 @Injectable()
 export class UsersService {
   constructor(
-    @InjectModel('User') private readonly userModel: Model<User>, 
+    @InjectRepository(User)
+    private readonly userRepository: Repository<User>,
   ) {}
 
   // Register a new user
   async create(createUserDto: CreateUserDto): Promise<User> {
-    console.log('🔹 Received CreateUserDto in UsersService:', createUserDto);
 
-    // Hash the password before saving
-    console.log('[USER] Received Hashed Password : ', createUserDto.password);
-    const isMatched = await bcrypt.compare('password123', createUserDto.password);
-    console.log('Password matched : ', isMatched);
-
-    const createdUser = new this.userModel({
+    const user = this.userRepository.create({
       ...createUserDto,
       password: createUserDto.password,
     });
 
-    return createdUser.save();
+    return this.userRepository.save(user);
   }
 
   // Find a user by email
   async findOneByEmail(email: string): Promise<User | null> {
-    const user = await this.userModel.findOne({ email }).exec();
-    return user ? user : null; // Return null if no user is found
+    return await this.userRepository.findOne({ where: { email } });
   }
 
   // Find all users
   async findAll(): Promise<User[]> {
-    return this.userModel.find().exec();
+    return this.userRepository.find();
   }
 
   // Find a user by ID
   async findById(id: string): Promise<User | null> {
-    return this.userModel.findById(id).exec(); // Fetch user from MongoDB
+    return await this.userRepository.findOne({ where: { id } });
   }
 
   // Mark a user as verified
-  async markVerified(email: string) {
-    return this.userModel.updateOne({ email }, { $set: { isVerified: true, verificationToken: null } });
-  }  
-
-  async updateVerificationToken(email: string, token: string) {
-    return this.userModel.updateOne({ email }, { verificationToken: token });
+  async markVerified(email: string): Promise<void> {
+    await this.userRepository.update({ email }, {
+      isVerified: true,
+      verificationToken: null,
+    });
   }
 
-  async deleteUser(email: string) {
-    return this.userModel.deleteOne({ email });
+  // Update the verification token
+  async updateVerificationToken(email: string, token: string): Promise<void> {
+    await this.userRepository.update({ email }, { verificationToken: token });
   }
-  
+
+  // Delete a user by email
+  async deleteUser(email: string): Promise<void> {
+    await this.userRepository.delete({ email });
+  }
 }
