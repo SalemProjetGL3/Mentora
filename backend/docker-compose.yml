@@ -69,6 +69,16 @@ services:
     depends_on:
       - mongo
 
+  chatbot-service:
+      build: ./services/chatbot-service 
+      container_name: chatbot_service
+      env_file:
+      - ./services/chatbot-service/.env
+      ports:
+        - "3005:3000" 
+
+
+
 volumes:
   mongo_data:
   mysql_data:
