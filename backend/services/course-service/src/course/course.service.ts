@@ -7,6 +7,7 @@ import { CreateCourseDto } from './dto/create-course.dto';
 import { UpdateCourseDto } from './dto/update-course.dto';
 import { CreateLessonDto } from './dto/create-lesson.dto';
 import { UpdateLessonDto } from './dto/update-lesson.dto';
+import { CreatePageDto } from './dto/create-page.dto';
 
 @Injectable()
 export class CourseService {
@@ -56,13 +57,9 @@ export class CourseService {
       throw new NotFoundException(`Course #${courseId} not found`);
     }
 
-    // On push la nouvelle lesson dans le tableau
     course.lessons.push({
       title: dto.title,
-      content: dto.content,
-      images: dto.images || [],
-      videoUrl: dto.videoUrl,
-      quizId: dto.quizId,
+      pages: dto.pages || [],
     });
 
     await course.save();
@@ -82,22 +79,13 @@ export class CourseService {
       throw new NotFoundException(`Lesson #${lessonId} not found in course #${courseId}`);
     }
 
-    // Mettre à jour chaque champ si présent dans dto
     if (dto.title !== undefined) {
       lesson.title = dto.title;
     }
-    if (dto.content !== undefined) {
-      lesson.content = dto.content;
-    }
-    if (dto.images !== undefined) {
-      lesson.images = dto.images;
-    }
-    if (dto.videoUrl !== undefined) {
-      lesson.videoUrl = dto.videoUrl;
-    }
-    if (dto.quizId !== undefined) {
-      lesson.quizId = dto.quizId;
-    }
+  
+    if (dto.pages !== undefined) {
+      lesson.set('pages', dto.pages);
+    }    
 
     await course.save();
     return course;
@@ -123,5 +111,42 @@ export class CourseService {
     return course;
   }
 
+  // --- Pages Management ---
+  async addPageToLesson(courseId: string, lessonId: string, pageDto: CreatePageDto): Promise<Course> {
+    const course = await this.courseModel.findById(courseId).exec();
+    if (!course) {
+      throw new NotFoundException(`Course #${courseId} not found`);
+    }
+  
+    const lesson = course.lessons.id(lessonId);
+    if (!lesson) {
+      throw new NotFoundException(`Lesson #${lessonId} not found in course #${courseId}`);
+    }
+  
+    lesson.pages.push(pageDto);
+    await course.save();
+    return course;
+  }
 
+  async removePageFromLesson(courseId: string, lessonId: string, pageId: string): Promise<Course> {
+    const course = await this.courseModel.findById(courseId).exec();
+    if (!course) {
+      throw new NotFoundException(`Course #${courseId} not found`);
+    }
+  
+    const lesson = course.lessons.id(lessonId);
+    if (!lesson) {
+      throw new NotFoundException(`Lesson #${lessonId} not found in course #${courseId}`);
+    }
+  
+    const page = lesson.pages.id(pageId);
+    if (!page) {
+      throw new NotFoundException(`Page #${pageId} not found in lesson #${lessonId}`);
+    }
+  
+    lesson.pages.pull({ _id: pageId });
+    await course.save();
+    return course;
+  }
+  
 }

@@ -1,23 +1,14 @@
-// src/course/dto/lesson.dto.ts
-import { IsString, IsOptional, IsArray } from 'class-validator';
+import { IsString, IsOptional, IsArray, ValidateNested } from 'class-validator';
+import { Type } from 'class-transformer';
+import { CreatePageDto } from './create-page.dto';
 
 export class CreateLessonDto {
   @IsString()
   title: string;
 
   @IsOptional()
-  @IsString()
-  content?: string;
-
-  @IsOptional()
   @IsArray()
-  images?: string[];
-
-  @IsOptional()
-  @IsString()
-  videoUrl?: string;
-
-  @IsOptional()
-  @IsString()
-  quizId?: string;
+  @ValidateNested({ each: true })
+  @Type(() => CreatePageDto)
+  pages?: CreatePageDto[];
 }
