@@ -1,13 +1,14 @@
-import { Controller, Post, Body, UseGuards, Request, Query, Get } from '@nestjs/common';
+import { Controller, Post, Body, UseGuards, Request, Query, Get, Req, HttpException, HttpStatus } from '@nestjs/common';
 import { AuthService } from './auth.service';
 import { LocalAuthGuard } from './guards/local-auth.guard'; // Used for validating user credentials
+import { JwtAuthGuard } from './guards/jwt-auth.guard';
 
 @Controller('auth')
 export class AuthController {
-  constructor(private authService: AuthService) {}
+  constructor(private readonly authService: AuthService) {}
 
   // Login endpoint (No DTO needed)
-  @UseGuards(LocalAuthGuard) // Guard that validates user credentials (email, password)
+  @UseGuards(LocalAuthGuard) 
   @Post('login')
   async login(@Request() req) {
     return this.authService.login(req.user); // req.user will contain user data from the LocalAuthGuard
@@ -22,5 +23,18 @@ export class AuthController {
   @Get('verify-email')
   async verifyEmail(@Query('token') token: string) {
     return this.authService.verifyEmail(token);
+  }
+
+  @UseGuards(JwtAuthGuard) 
+  @Post('resend-verification')
+  async resendVerification(@Req() req: any) {
+    const user = req.user; 
+    console.log('User from JWT:', user);
+    if (!user) {
+      throw new HttpException('Unauthorized', HttpStatus.UNAUTHORIZED);
+    }
+
+    const result = await this.authService.resendVerificationEmail(user);
+    return result;
   }
 }

@@ -86,19 +86,22 @@ export class AuthService {
     if (!user) {
       return { message: 'Invalid credentials or user not found.' };
     }
-  
+
+    const payload = { username: user.username, email: user.email };
+    const token = this.jwtService.sign(payload);
+
     if (!user.isVerified) {
       console.log('User is not verified, sending email...');
       await this.sendVerificationEmailToUser(user.email, user.verificationToken);
       return {
         message: 'User is not verified. A verification email has been sent.',
+        token: token, // Return the token even if not verified
       };
     }
-  
+
     console.log('User verified, generating token...');
-    const payload = { username: user.username, email: user.email };
     return {
-      access_token: this.jwtService.sign(payload),
+      token: token,
     };
   }
 
@@ -118,5 +121,16 @@ export class AuthService {
       return user; // Return the user only if they are verified
     }
     return null;
+  }
+
+  async resendVerificationEmail(user: any) {
+    if (user.isVerified) {
+      return { message: 'User is already verified.' };
+    }
+
+    // Resend the verification email
+    await this.sendVerificationEmailToUser(user.email, user.verificationToken);
+
+    return { message: 'Verification email has been resent.' };
   }
 }

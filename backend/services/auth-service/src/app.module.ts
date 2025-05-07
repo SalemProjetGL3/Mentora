@@ -11,7 +11,7 @@ import sessionConfig from './auth/config/session.config';
     ConfigModule.forRoot({
       isGlobal: true,
       envFilePath: [
-        join(__dirname, '../../../.env'),
+        join(__dirname, '../../.env'),
         join(__dirname, '../.env'),
       ],
       load: [sessionConfig],
