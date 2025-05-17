@@ -5,6 +5,7 @@ import { CreateCourseDto } from './dto/create-course.dto';
 import { UpdateCourseDto } from './dto/update-course.dto';
 import { CreateLessonDto } from './dto/create-lesson.dto';
 import { UpdateLessonDto } from './dto/update-lesson.dto';
+import { CreatePageDto } from './dto/create-page.dto';
 
 @Controller('courses')
 export class CourseController {
@@ -36,8 +37,6 @@ export class CourseController {
   }
 
   // --- Lessons Management ---
-
-  
   @Post(':courseId/lessons')
   addLesson(
     @Param('courseId') courseId: string,
@@ -61,6 +60,25 @@ export class CourseController {
     @Param('lessonId') lessonId: string,
   ) {
     return this.courseService.removeLesson(courseId, lessonId);
+  }
+
+  // --- Pages Management ---
+  @Post(':courseId/lessons/:lessonId/pages')
+  addPageToLesson(
+    @Param('courseId') courseId: string,
+    @Param('lessonId') lessonId: string,
+    @Body() dto: CreatePageDto,
+  ) {
+    return this.courseService.addPageToLesson(courseId, lessonId, dto);
+  }
+
+  @Delete(':courseId/lessons/:lessonId/pages/:pageId')
+  removePageFromLesson(
+    @Param('courseId') courseId: string,
+    @Param('lessonId') lessonId: string,
+    @Param('pageId') pageId: string,
+  ) {
+    return this.courseService.removePageFromLesson(courseId, lessonId, pageId);
   }
 
 }

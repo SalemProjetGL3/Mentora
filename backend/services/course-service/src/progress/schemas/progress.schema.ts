@@ -11,6 +11,9 @@ export class Progress extends Document {
   courseId: string;
 
   @Prop({ type: [String], default: [] })
+  completedPages: string[];
+
+  @Prop({ type: [String], default: [] })
   completedLessons: string[];
 
   @Prop({ type: [String], default: [] })

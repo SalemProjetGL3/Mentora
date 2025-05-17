@@ -26,49 +26,54 @@ export class ProgressService {
     courseId: string,
     dto: UpdateProgressDto
   ): Promise<Progress> {
-    // Récupérer ou créer le document progress
     let progress = await this.progressModel.findOne({ userId, courseId }).exec();
     if (!progress) {
       progress = new this.progressModel({
         userId,
         courseId,
         startedAt: new Date(),
+        completedPages: [],
         completedLessons: [],
         completedAssessments: [],
       });
     }
-
-    // Ajouter la leçon terminée
-    if (dto.completedLessonId) {
-      if (!progress.completedLessons.includes(dto.completedLessonId)) {
-        progress.completedLessons.push(dto.completedLessonId);
-      }
+  
+    // Ajouter la page complétée
+    if (dto.completedPageId && !progress.completedPages.includes(dto.completedPageId)) {
+      progress.completedPages.push(dto.completedPageId);
     }
-
-    // Ajouter l'évaluation (quiz) terminée
-    if (dto.completedAssessmentId) {
-      if (!progress.completedAssessments.includes(dto.completedAssessmentId)) {
-        progress.completedAssessments.push(dto.completedAssessmentId);
-      }
+  
+    // Ajouter le quiz complété
+    if (dto.completedAssessmentId && !progress.completedAssessments.includes(dto.completedAssessmentId)) {
+      progress.completedAssessments.push(dto.completedAssessmentId);
     }
-
-    // Recalcul du taux de progression
+  
+    // Charger le cours pour recalculer la progression
     const course = await this.courseModel.findById(courseId).exec();
     if (!course) {
       throw new NotFoundException(`Course #${courseId} not found`);
     }
-
-    const totalUnits = course.lessons.reduce((acc, lesson) => {
-      return acc + 1 + (lesson.quizId ? 1 : 0);
-    }, 0);
   
-    // Les unités complétées sont celles des leçons et des évaluations
+    // Réinitialiser les leçons complétées
+    progress.completedLessons = [];
+  
+    for (const lesson of course.lessons) {
+      const allPageIds = lesson.pages.map(p => p._id.toString());
+      const allPagesCompleted = allPageIds.every(pid => progress.completedPages.includes(pid));
+      if (allPagesCompleted) {
+        progress.completedLessons.push(lesson._id.toString());
+      }
+    }
+  
+    // Calcul du taux de progression :
+    const totalUnits = course.lessons.length + progress.completedAssessments.length; // 1 unité par leçon + 1 par quiz complété
     const completedUnits = progress.completedLessons.length + progress.completedAssessments.length;
   
     let newRate = 0;
     if (totalUnits > 0) {
       newRate = Math.round((completedUnits / totalUnits) * 100);
     }
+  
     progress.progressRate = newRate;
   
     if (newRate === 100 && !progress.finishedAt) {
@@ -77,7 +82,7 @@ export class ProgressService {
   
     await progress.save();
     return progress;
-  }
+  }  
 
   async initProgress(userId: string, courseId: string): Promise<Progress> {
     let progress = await this.progressModel.findOne({ userId, courseId }).exec();
