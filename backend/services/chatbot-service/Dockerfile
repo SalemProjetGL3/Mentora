@@ -1,22 +1,39 @@
-# Utilise une image Node.js
-FROM node:22-alpine
+# Use official Node.js LTS image
+FROM node:20-alpine AS builder
 
-# Définir le dossier de travail
-WORKDIR /usr/src/app
+# Set working directory
+WORKDIR /app
 
-# Copier package.json et installer les dépendances
-COPY package*.json ./
-RUN npm install
+# Copy package.json and package-lock.json/yarn.lock
+COPY package.json ./
+COPY yarn.lock ./
+COPY package-lock.json ./
 
-# Copier le reste du code
+# Install dependencies
+RUN if [ -f yarn.lock ]; then yarn install --frozen-lockfile; else npm ci; fi
+
+# Copy the rest of the application source code
 COPY . .
 
-# Copier fichier .env dans roadmap-service/
-COPY .env .env
+# Build the NestJS application
+RUN npm run build
 
+# Production image
+FROM node:20-alpine
 
-# Exposer le port 3000
-EXPOSE 3000
+WORKDIR /app
 
-# Démarrer l'application
-CMD ["npm", "run", "start"]
+# Copy only the built files and production dependencies
+COPY package.json ./
+COPY yarn.lock ./
+COPY package-lock.json ./
+RUN if [ -f yarn.lock ]; then yarn install --frozen-lockfile --production; else npm ci --only=production; fi
+
+COPY --from=builder /app/dist ./dist
+COPY .env ./
+
+# Docker cannot read .env at build time, so set a default or use build args if needed
+EXPOSE ${PORT:-3010}
+
+# Start the application
+CMD ["node", "dist/main"]
