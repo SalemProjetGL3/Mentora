@@ -1,7 +1,7 @@
 import { Controller, Post, Body, UseGuards, Request, Query, Get, Req, HttpException, HttpStatus } from '@nestjs/common';
 import { AuthService } from './auth.service';
-import { LocalAuthGuard } from './guards/local-auth.guard'; // Used for validating user credentials
-import { JwtAuthGuard } from './guards/jwt-auth.guard';
+import { LocalAuthGuard } from './guards/local-auth.guard'; 
+import { JwtClientGuard } from './guards/jwt-client-auth.guard';
 
 @Controller('auth')
 export class AuthController {
@@ -25,7 +25,7 @@ export class AuthController {
     return this.authService.verifyEmail(token);
   }
 
-  @UseGuards(JwtAuthGuard) 
+  @UseGuards(JwtClientGuard) 
   @Post('resend-verification')
   async resendVerification(@Req() req: any) {
     const user = req.user; 
@@ -36,5 +36,16 @@ export class AuthController {
 
     const result = await this.authService.resendVerificationEmail(user);
     return result;
+  }
+
+  // Me endpoint
+  @UseGuards(JwtClientGuard)
+  @Get('me')
+  async getMe(@Req() req: any) {
+    const user = req.user;
+    if (!user) {
+      throw new HttpException('Unauthorized', HttpStatus.UNAUTHORIZED);
+    }
+    return { user };
   }
 }

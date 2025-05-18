@@ -24,7 +24,7 @@ export class AuthService {
     // Generate verification token
     const verificationToken = this.jwtService.sign(
       { email },
-      { secret: this.configService.get('JWT_SECRET'), expiresIn: '1d' },
+      { secret: this.configService.get('JWT_SECRET'), expiresIn: this.configService.get('JWT_EXPIRATION_TIME') },
     );
 
     // Hash the password and create user
@@ -40,7 +40,19 @@ export class AuthService {
     // Send verification email
     await this.sendVerificationEmailToUser(user.email, verificationToken);
 
-    return { message: 'Registration successful. Please check your email.' };
+    // Generate a client-side token for the user
+    const clientSideToken = this.jwtService.sign(
+      { email },
+      {
+        secret: this.configService.get('JWT_EMAIL_ONLY_SECRET'),
+        expiresIn: '30m' 
+      }
+    );
+
+    return { 
+      message: 'Registration successful. Please check your email.', 
+      token: clientSideToken 
+    };  
   }
 
   // Send verification email
@@ -93,9 +105,19 @@ export class AuthService {
     if (!user.isVerified) {
       console.log('User is not verified, sending email...');
       await this.sendVerificationEmailToUser(user.email, user.verificationToken);
+      
+      // Generate a client-side token for the user
+      const clientSideToken = this.jwtService.sign(
+        { email: user.email },
+        {
+          secret: this.configService.get('JWT_EMAIL_ONLY_SECRET'),
+          expiresIn: '30m' 
+        }
+      );
+     
       return {
         message: 'User is not verified. A verification email has been sent.',
-        token: token, // Return the token even if not verified
+        clientSideToken: clientSideToken
       };
     }
 
