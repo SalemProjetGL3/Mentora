@@ -51,8 +51,53 @@ export class AuthController {
     return result;
   }
 
-  @Get('public-key')
-  getPublicKey(@Res() res: Response) {
-    res.type('text/plain').send(process.env.JWT_PUBLIC_KEY);
+  // @Get('public-key')
+  // getPublicKey(@Res() res: Response) {
+  //   res.type('text/plain').send(process.env.JWT_PUBLIC_KEY);
+  // }
+
+  @Post('logout')
+  async logout(@Res({ passthrough: true }) res: Response) {
+    // Clear the token cookie
+    res.clearCookie('token', {
+      httpOnly: true,
+      secure: true,
+      sameSite: 'strict',
+      path: '/',
+    });
+
+    return { message: 'Logout successful' };
+  }
+
+  // Request password reset
+  @Post('forgot-password')
+  async forgotPassword(@Body('email') email: string) {
+    const result = await this.authService.sendPasswordResetEmail(email);
+    if (!result) {
+      throw new HttpException('User not found', HttpStatus.NOT_FOUND);
+    }
+    return { message: 'Password reset email sent' };
+  }
+
+  // Reset password
+  @Post('reset-password')
+  async resetPassword(
+    @Req() req: any,
+    @Body('password') newPassword: string,
+  ) {
+    const authHeader = req.headers.authorization;
+
+    if (!authHeader || !authHeader.startsWith('Bearer ')) {
+      throw new HttpException('Authorization header missing or malformed', HttpStatus.BAD_REQUEST);
+    }
+
+    const token = authHeader.split(' ')[1];
+    console.log('[resetPassword] Extracted token from Authorization header:', token);
+
+    const result = await this.authService.resetPassword(token, newPassword);
+    if (!result) {
+      throw new HttpException('Invalid or expired token', HttpStatus.BAD_REQUEST);
+    }
+    return { message: 'Password reset successful' };
   }
 }
