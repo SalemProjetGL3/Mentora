@@ -19,12 +19,17 @@ export class AuthService {
   async register(email: string, password: string, username: string) {
     // Check if user already exists
     const existingUser = await this.usersService.findOneByEmail(email);
-    if (existingUser) throw new BadRequestException('Email already in use');
+    if (existingUser) {
+      return { errorMessage: 'User with this email already exists.' };
+    }
 
     // Generate verification token
     const verificationToken = this.jwtService.sign(
       { email },
-      { secret: this.configService.get('JWT_SECRET'), expiresIn: this.configService.get('JWT_EXPIRATION_TIME') },
+      { 
+        secret: this.configService.get('JWT_SECRET'), 
+        expiresIn: this.configService.get('JWT_EXPIRATION_TIME') 
+      }
     );
 
     // Hash the password and create user
@@ -50,7 +55,6 @@ export class AuthService {
     );
 
     return { 
-      message: 'Registration successful. Please check your email.', 
       token: clientSideToken 
     };  
   }
@@ -95,10 +99,6 @@ export class AuthService {
 
   // Login user
   async login(user: any) {
-    if (!user) {
-      return { message: 'Invalid credentials or user not found.' };
-    }
-
     const payload = { username: user.username, email: user.email };
     const token = this.jwtService.sign(payload);
 
@@ -116,7 +116,7 @@ export class AuthService {
       );
      
       return {
-        message: 'User is not verified. A verification email has been sent.',
+        errorMessage: 'User is not verified. A verification email has been sent.',
         clientSideToken: clientSideToken
       };
     }

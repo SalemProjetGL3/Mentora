@@ -10,7 +10,7 @@ export class MailerService {
 
   constructor(private configService: ConfigService) {
     this.transporter = nodemailer.createTransport({
-      service: 'gmail', // Change if using another service
+      service: 'gmail',
       auth: {
         user: this.configService.get<string>('EMAIL_USER'), 
         pass: this.configService.get<string>('EMAIL_PASS'),
@@ -20,7 +20,7 @@ export class MailerService {
 
   // Function to send verification email
   async sendVerificationEmail(to: string, token: string) {
-    const verificationUrl = `http://localhost:3000/auth/verify-email?token=${token}`;
+    const verificationUrl = `http://localhost:2000/verify-email?token=${token}`;
     
     // Read the HTML template from file
     const templatePath = path.join('src/mailer/templates', 'verify-email.html');

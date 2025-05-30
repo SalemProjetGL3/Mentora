@@ -1,17 +1,31 @@
-import { Controller, Post, Body, UseGuards, Request, Query, Get, Req, HttpException, HttpStatus } from '@nestjs/common';
+import { Controller, Post, Body, UseGuards, Request, Query, Get, Req, HttpException, HttpStatus, Res } from '@nestjs/common';
 import { AuthService } from './auth.service';
 import { LocalAuthGuard } from './guards/local-auth.guard'; 
-import { JwtClientGuard } from './guards/jwt-client-auth.guard';
+import { Response } from 'express'; 
 
 @Controller('auth')
 export class AuthController {
   constructor(private readonly authService: AuthService) {}
 
   // Login endpoint (No DTO needed)
-  @UseGuards(LocalAuthGuard) 
+  @UseGuards(LocalAuthGuard)
   @Post('login')
-  async login(@Request() req) {
-    return this.authService.login(req.user); // req.user will contain user data from the LocalAuthGuard
+  async login(@Request() req, @Res({ passthrough: true }) res: Response) {
+    // Await the result of the login method
+    const token = await this.authService.login(req.user);
+
+    // Check if the token object contains a 'token' property
+    if (token.token) {
+      res.cookie('token', token.token, {
+        httpOnly: true,
+        secure: true,
+        sameSite: 'strict', 
+        maxAge: 24 * 60 * 60 * 1000,
+        path: '/',
+      });
+    }
+
+    return token;
   }
 
   // Register endpoint (Requires CreateUserDto)
@@ -25,7 +39,6 @@ export class AuthController {
     return this.authService.verifyEmail(token);
   }
 
-  @UseGuards(JwtClientGuard) 
   @Post('resend-verification')
   async resendVerification(@Req() req: any) {
     const user = req.user; 
@@ -38,14 +51,8 @@ export class AuthController {
     return result;
   }
 
-  // Me endpoint
-  @UseGuards(JwtClientGuard)
-  @Get('me')
-  async getMe(@Req() req: any) {
-    const user = req.user;
-    if (!user) {
-      throw new HttpException('Unauthorized', HttpStatus.UNAUTHORIZED);
-    }
-    return { user };
+  @Get('public-key')
+  getPublicKey(@Res() res: Response) {
+    res.type('text/plain').send(process.env.JWT_PUBLIC_KEY);
   }
 }
