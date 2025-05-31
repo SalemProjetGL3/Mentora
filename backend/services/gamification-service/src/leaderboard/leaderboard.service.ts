@@ -14,10 +14,10 @@ export class LeaderboardService {
     private userRewardsModel: Model<UserRewards>,
   ) {}
 
-  async getLeaderboard(limit = 10) {
+  async getLeaderboard(limit = 5) {
     return this.userRewardsModel
       .find()
-      .sort({ totalPoints: -1 }) // Sort by totalPoints in descending order
+      .sort({ totalPoints: -1 }) 
       .limit(limit)
       .exec();
   }
@@ -26,8 +26,8 @@ export class LeaderboardService {
   async handlePointsUpdated(payload: { userId: number }) {
     this.logger.log(`Leaderboard triggered for user: ${payload.userId}`);
     // Re-query top 10 users after update
-    const top10 = await this.getLeaderboard(10);
-    this.leaderboardUpdates$.next(top10);
+    const top5 = await this.getLeaderboard(5);
+    this.leaderboardUpdates$.next(top5);
   }
   
   // Method to get leaderboard updates as an observable
