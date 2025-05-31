@@ -98,7 +98,7 @@ export class AuthService {
 
   // Login user
   async login(user: any, rememberMe: boolean) {
-    const payload = { username: user.username, email: user.email };
+    const payload = { username: user.username, email: user.email, role: user.role };
 
     // Set token expiration based on "Remember Me"
     const expiresIn = rememberMe
@@ -138,7 +138,7 @@ export class AuthService {
   // Validate user credentials (for login)
   async validateUser(email: string, password: string): Promise<any> {
     const user = await this.usersService.findOneByEmail(email);
-    console.log('User found in validateUser:', user);
+    // console.log('User found in validateUser:', user);
 
     if(!user) {
       console.log('User not found:', email);

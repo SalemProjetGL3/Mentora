@@ -7,18 +7,24 @@ export class JwtAuthGuard implements CanActivate {
 
   canActivate(context: ExecutionContext): boolean {
     const request = context.switchToHttp().getRequest();
-    const authHeader = request.headers.authorization;
 
-    if (!authHeader || !authHeader.startsWith('Bearer ')) {
+    // Extract the token from the cookies
+    const token = request.cookies?.token;
+    console.log('[JwtAuthGuard] Token from cookie:', token);
+
+    if (!token) {
+      console.log('[JwtAuthGuard] No token found in cookies.');
       return false;
     }
 
-    const token = authHeader.split(' ')[1];
     try {
+      // Verify the token
       const decoded = this.jwtService.verify(token);
       request.user = decoded;
+      console.log('[JwtAuthGuard] User decoded from token:', request.user);
       return true;
     } catch (err) {
+      console.log('[JwtAuthGuard] Token verification failed:', err);
       return false;
     }
   }
