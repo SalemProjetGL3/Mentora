@@ -76,13 +76,17 @@ services:
       - ./services/chatbot-service/.env
     ports:
       - "3005:3010"
-    environment:
-      # Add any required environment variables here, for example:
-      # - PYTHON_WS_URL=ws://python-service:port
-      # - PORT=3010
+
+  quiz-service:
+    build: ./services/quiz-service
+    container_name: quiz_service
+    env_file:
+      - ./services/quiz-service/.env
+    ports:
+      - "3006:3000"
     depends_on:
-      # Add dependencies if needed, e.g.:
-      # - python-service
+      - mongo
+
 
 volumes:
   mongo_data:

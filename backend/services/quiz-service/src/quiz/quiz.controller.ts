@@ -41,4 +41,11 @@ export class QuizController {
   submitAnswers(@Param('id') quizId: string, @Body() submissionDto: QuizSubmissionDto) {
     return this.quizService.validateAnswers(quizId, submissionDto);
   }
+
+  // Endpoint to get quiz by tags
+  @Get('tags')
+  findByTags(@Query('tags') tags: string) {
+    const tagsArray = tags ? tags.split(',').map(tag => tag.trim()) : [];
+    return this.quizService.findByTags(tagsArray);
+  }
 }
