@@ -3,6 +3,11 @@ import { Document } from 'mongoose';
 import { Answer } from './answer.schema'; 
 
 export type QuestionDocument = Question & Document;
+export enum QuestionType {
+  SINGLE_CHOICE = 'single-choice',
+  MULTIPLE_CHOICE = 'multiple-choice',
+  TRUE_FALSE = 'true-false',
+}
 
 @Schema({ timestamps: true })
 export class Question {
