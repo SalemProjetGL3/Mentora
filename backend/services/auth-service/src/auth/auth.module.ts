@@ -24,13 +24,12 @@ import { User } from 'src/users/user.entity';
       }),
       inject: [ConfigService],
     }), 
-    forwardRef(() => UsersModule),
     UsersModule,
     MailerModule,
   ],
   providers: [AuthService, LocalStrategy, JwtStrategy, SessionSerializer],
   controllers: [AuthController],
-  exports: [AuthService, JwtModule],
+  exports: [AuthService],
 })
 export class AuthModule implements NestModule {
   configure(consumer: MiddlewareConsumer) {

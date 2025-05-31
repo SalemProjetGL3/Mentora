@@ -36,9 +36,6 @@ async function bootstrap() {
   app.use(passport.initialize());
   app.use(passport.session());
 
-  console.log('Initializing middleware...');
-  console.log(`CORS enabled for origin: ${process.env.CORS_ORIGIN || 'http://localhost:2000'}`);
-
   try {
     await app.listen(process.env.PORT ?? 3000);
     console.log(`Application is running on port ${process.env.PORT ?? 3000}`);
