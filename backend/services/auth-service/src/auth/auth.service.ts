@@ -97,26 +97,35 @@ export class AuthService {
   }
 
   // Login user
-  async login(user: any) {
+  async login(user: any, rememberMe: boolean) {
     const payload = { username: user.username, email: user.email };
-    const token = this.jwtService.sign(payload);
+
+    // Set token expiration based on "Remember Me"
+    const expiresIn = rememberMe
+      ? '7d' // 7 days for "Remember Me"
+      : '1h'; // 1 hour for default session
+
+    const token = this.jwtService.sign(payload, {
+      expiresIn,
+      secret: this.configService.get<string>('JWT_SECRET'),
+    });
 
     if (!user.isVerified) {
       console.log('User is not verified, sending email...');
       await this.sendVerificationEmailToUser(user.email, user.verificationToken);
-      
+
       // Generate a client-side token for the user
       const clientSideToken = this.jwtService.sign(
         { email: user.email },
         {
           secret: this.configService.get('JWT_EMAIL_ONLY_SECRET'),
-          expiresIn: '30m' 
-        }
+          expiresIn: '30m',
+        },
       );
-     
+
       return {
         errorMessage: 'User is not verified. A verification email has been sent.',
-        clientSideToken: clientSideToken
+        clientSideToken: clientSideToken,
       };
     }
 
