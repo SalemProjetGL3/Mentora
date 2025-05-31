@@ -15,6 +15,7 @@ export class QuizService {
     private readonly questionService: QuestionService,
   ) {}
 
+  // Endpoint to create a new quiz
   async create(createQuizDto: CreateQuizDto): Promise<QuizDocument> { 
     // Validate if all questionIds exist
     for (const qId of createQuizDto.questionIds) {
@@ -24,10 +25,12 @@ export class QuizService {
     return newQuiz.save();
   }
 
+  // Endpoint to get all quizzes
   async findAll(): Promise<QuizDocument[]> { 
     return this.quizModel.find().exec();
   }
 
+  // Endpoint to get a quiz by ID, with an optional query parameter to populate questions
   async findOne(id: string, populateQuestions: boolean = false): Promise<QuizDocument> { 
     const query = this.quizModel.findById(id);
     if (populateQuestions) {
@@ -41,6 +44,15 @@ export class QuizService {
     return quiz;
   }
 
+  //find by tags
+  async findByTags(tags: string[]): Promise<QuizDocument[]> { 
+    if (!tags || tags.length === 0) {
+      throw new BadRequestException('Tags must be provided as a non-empty array');
+    }
+    return this.quizModel.find({ tags: { $in: tags } }).exec();
+  }
+
+  // Endpoint to update a quiz by ID
   async update(id: string, updateQuizDto: UpdateQuizDto): Promise<QuizDocument> { 
     if (updateQuizDto.questionIds) {
       for (const qId of updateQuizDto.questionIds) {
@@ -54,6 +66,7 @@ export class QuizService {
     return existingQuiz;
   }
 
+  // Endpoint to delete a quiz by ID
   async remove(id: string): Promise<{ message: string }> { 
     const result = await this.quizModel.deleteOne({ _id: id }).exec();
     if (result.deletedCount === 0) {
@@ -62,6 +75,7 @@ export class QuizService {
     return { message: `Quiz with ID "${id}" successfully deleted` };
   }
 
+  // Endpoint to validate answers for a specific quiz
   async validateAnswers(quizId: string, submission: QuizSubmissionDto): Promise<any> { 
     const quiz = await this.findOne(quizId, true); 
 
@@ -69,7 +83,7 @@ export class QuizService {
       throw new BadRequestException('Quiz has no questions to validate or questionIds is not an array.');
     }
 
-    
+    // Check if questionIds are populated objects
     if (quiz.questionIds.length > 0 && !(typeof quiz.questionIds[0] === 'object' && quiz.questionIds[0] !== null)) {
         throw new BadRequestException('Questions in the quiz are not properly populated. Expected objects, got IDs.');
     }

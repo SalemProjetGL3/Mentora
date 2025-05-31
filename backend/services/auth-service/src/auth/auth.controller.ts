@@ -10,20 +10,23 @@ export class AuthController {
   // Login endpoint (No DTO needed)
   @UseGuards(LocalAuthGuard)
   @Post('login')
-  async login(@Request() req, @Res({ passthrough: true }) res: Response) {
-    // Await the result of the login method
-    const token = await this.authService.login(req.user);
+  async login(
+    @Request() req,
+    @Body('rememberMe') rememberMe: boolean,
+    @Res({ passthrough: true }) res: Response,
+  ) {
+    const token = await this.authService.login(req.user, rememberMe);
 
-    // Check if the token object contains a 'token' property
-    if (token.token) {
-      res.cookie('token', token.token, {
-        httpOnly: true,
-        secure: true,
-        sameSite: 'strict', 
-        maxAge: 24 * 60 * 60 * 1000,
-        path: '/',
-      });
-    }
+    // Set the token in a cookie
+    res.cookie('token', token.token, {
+      httpOnly: true,
+      secure: true,
+      sameSite: 'strict',
+      maxAge: rememberMe
+        ? 7 * 24 * 60 * 60 * 1000 // 7 days
+        : 1 * 60 * 60 * 1000, // 1 hour
+      path: '/',
+    });
 
     return token;
   }
