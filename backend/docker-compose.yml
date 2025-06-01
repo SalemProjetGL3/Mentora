@@ -22,16 +22,22 @@ services:
       - mysql_data:/var/lib/mysql
 
   auth-service:
-    build: ./services/auth-service
+    build: 
+      context: .
+      dockerfile: services/auth-service/Dockerfile
     container_name: auth_service
     env_file:
       - ./services/auth-service/.env
     ports:
       - "3001:3000"
     environment:
-      - MONGO_URI=${MONGO_URI}
+       DB_HOST: mysql
+       DB_PORT: ${DB_PORT}       
+       DB_USERNAME: ${DB_USERNAME}
+       DB_PASSWORD: ${MYSQL_ROOT_PASSWORD}
+       DB_NAME: ${DB_NAME}
     depends_on:
-      - mongo
+      - mysql
 
   user-service:
     build: ./services/user-service
