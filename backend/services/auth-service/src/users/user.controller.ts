@@ -1,6 +1,8 @@
-import { Controller, Post, Body, Get, Param } from '@nestjs/common';
+import { Controller, Post, Body, Get, Param, UseGuards } from '@nestjs/common';
 import { UsersService } from './user.service';
 import { CreateUserDto } from './dto/create-user.dto';
+
+import { JwtAuthGuard, RolesGuard, Roles } from 'auth-utils';
 
 @Controller('users')
 export class UsersController {
@@ -13,6 +15,8 @@ export class UsersController {
   }
 
   // Optional: Endpoint to get all users (for testing purposes)
+  @Roles('ADMIN') 
+  @UseGuards(JwtAuthGuard, RolesGuard)
   @Get()
   async findAll() {
     return this.usersService.findAll();

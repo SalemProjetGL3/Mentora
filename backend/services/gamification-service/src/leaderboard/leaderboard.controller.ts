@@ -12,7 +12,7 @@ export class LeaderboardController {
     @Sse('stream')
     streamLeaderboard(): Observable<MessageEvent> {
       return this.leaderboardService.getLeaderboardUpdates().pipe(
-        map((top10) => new MessageEvent('leaderboardUpdate', { data: top10 }))
+        map((top5) => new MessageEvent('leaderboardUpdate', { data: top5 }))
       );
     }
 }

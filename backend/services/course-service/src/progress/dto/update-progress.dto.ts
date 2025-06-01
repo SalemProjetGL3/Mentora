@@ -4,7 +4,7 @@ import { IsOptional, IsString } from 'class-validator';
 export class UpdateProgressDto {
   @IsOptional()
   @IsString()
-  completedPageId?: string;
+  completedLessonId?: string;
 
   @IsOptional()
   @IsString()

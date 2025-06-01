@@ -5,9 +5,9 @@ import { Model } from 'mongoose';
 import { Course, CourseDocument } from './schemas/course.schema';
 import { CreateCourseDto } from './dto/create-course.dto';
 import { UpdateCourseDto } from './dto/update-course.dto';
+import { CreateModuleDto } from './dto/create-module.dto';
+import { UpdateModuleDto } from './dto/update-module.dto';
 import { CreateLessonDto } from './dto/create-lesson.dto';
-import { UpdateLessonDto } from './dto/update-lesson.dto';
-import { CreatePageDto } from './dto/create-page.dto';
 
 @Injectable()
 export class CourseService {
@@ -25,7 +25,7 @@ export class CourseService {
   }
 
   async findOne(id: string): Promise<Course> {
-    const course = await this.courseModel.findById(id).exec();
+    const course = await this.courseModel.findOne({ id: Number(id) }).exec();
     if (!course) {
       throw new NotFoundException(`Course #${id} not found`);
     }
@@ -34,7 +34,7 @@ export class CourseService {
 
   async update(id: string, dto: UpdateCourseDto): Promise<Course> {
     const updated = await this.courseModel
-      .findByIdAndUpdate(id, dto, { new: true })
+      .findOneAndUpdate({ id: Number(id) }, dto, { new: true })
       .exec();
     if (!updated) {
       throw new NotFoundException(`Course #${id} not found`);
@@ -43,23 +43,23 @@ export class CourseService {
   }
 
   async remove(id: string): Promise<void> {
-    const result = await this.courseModel.findByIdAndDelete(id).exec();
+    const result = await this.courseModel.findOneAndDelete({ id: Number(id) }).exec();
     if (!result) {
       throw new NotFoundException(`Course #${id} not found`);
     }
   }
 
 
-  // --- Lessons Management ---
-  async addLesson(courseId: string, dto: CreateLessonDto): Promise<Course> {
-    const course = await this.courseModel.findById(courseId).exec();
+  // --- Modules Management ---
+  async addModule(courseId: string, dto: CreateModuleDto): Promise<Course> {
+    const course = await this.courseModel.findOne({ id: Number(courseId) }).exec();
     if (!course) {
       throw new NotFoundException(`Course #${courseId} not found`);
     }
 
-    course.lessons.push({
+    course.modules.push({
       title: dto.title,
-      pages: dto.pages || [],
+      lessons: dto.lessons || [],
     });
 
     await course.save();
@@ -67,24 +67,24 @@ export class CourseService {
   }
 
   
-  async updateLesson(courseId: string, lessonId: string, dto: UpdateLessonDto): Promise<Course> {
-    const course = await this.courseModel.findById(courseId).exec();
+  async updateModule(courseId: string, moduleId: string, dto: UpdateModuleDto): Promise<Course> {
+    const course = await this.courseModel.findOne({ id: Number(courseId) }).exec();
     if (!course) {
       throw new NotFoundException(`Course #${courseId} not found`);
     }
 
     // Trouver la lesson correspondante dans le tableau
-    const lesson = course.lessons.id(lessonId);
-    if (!lesson) {
-      throw new NotFoundException(`Lesson #${lessonId} not found in course #${courseId}`);
+    const module = course.modules.find(m => m.id === Number(moduleId));
+    if (!module) {
+      throw new NotFoundException(`Module #${moduleId} not found in course #${moduleId}`);
     }
 
     if (dto.title !== undefined) {
-      lesson.title = dto.title;
+      module.title = dto.title;
     }
   
-    if (dto.pages !== undefined) {
-      lesson.set('pages', dto.pages);
+    if (dto.lessons !== undefined) {
+      module.set('lessons', dto.lessons);
     }    
 
     await course.save();
@@ -92,59 +92,57 @@ export class CourseService {
   }
 
   
-  async removeLesson(courseId: string, lessonId: string): Promise<Course> {
-    const course = await this.courseModel.findById(courseId).exec();
+  async removeModule(courseId: string, moduleId: string): Promise<Course> {
+    const course = await this.courseModel.findOne({ id: Number(courseId) }).exec();
     if (!course) {
       throw new NotFoundException(`Course #${courseId} not found`);
     }
 
-    // On cherche la lesson
-    const lesson = course.lessons.id(lessonId);
-    if (!lesson) {
-      throw new NotFoundException(`Lesson #${lessonId} not found in course #${courseId}`);
+    // On cherche le module
+    const module = course.modules.find(m => m.id === Number(moduleId));
+    if (!module) {
+      throw new NotFoundException(`Module #${moduleId} not found in course #${courseId}`);
     }
+    course.modules.pull(module);
 
-    // On supprime la lesson du sous-document
-    course.lessons.pull({ _id: lessonId }); 
-    await course.save();
-
-    return course;
-  }
-
-  // --- Pages Management ---
-  async addPageToLesson(courseId: string, lessonId: string, pageDto: CreatePageDto): Promise<Course> {
-    const course = await this.courseModel.findById(courseId).exec();
-    if (!course) {
-      throw new NotFoundException(`Course #${courseId} not found`);
-    }
-  
-    const lesson = course.lessons.id(lessonId);
-    if (!lesson) {
-      throw new NotFoundException(`Lesson #${lessonId} not found in course #${courseId}`);
-    }
-  
-    lesson.pages.push(pageDto);
     await course.save();
     return course;
   }
 
-  async removePageFromLesson(courseId: string, lessonId: string, pageId: string): Promise<Course> {
-    const course = await this.courseModel.findById(courseId).exec();
+  // --- Lessons Management ---
+  async addLessonToModule(courseId: string, moduleId: string, lessonDto: CreateLessonDto): Promise<Course> {
+    const course = await this.courseModel.findOne({ id: Number(courseId) }).exec();
     if (!course) {
       throw new NotFoundException(`Course #${courseId} not found`);
     }
   
-    const lesson = course.lessons.id(lessonId);
+    const module = course.modules.find(m => m.id === Number(moduleId));
+    if (!module) {
+      throw new NotFoundException(`Module #${moduleId} not found in course #${courseId}`);
+    }
+  
+    module.lessons.push(lessonDto);
+    await course.save();
+    return course;
+  }
+
+  async removeLessonFromModule(courseId: string, moduleId: string, lessonId: string): Promise<Course> {
+    const course = await this.courseModel.findOne({ id: Number(courseId) }).exec();
+    if (!course) {
+      throw new NotFoundException(`Course #${courseId} not found`);
+    }
+  
+    const module = course.modules.find(m => m.id === Number(moduleId));
+    if (!module) {
+      throw new NotFoundException(`Module #${lessonId} not found in course #${courseId}`);
+    }
+  
+    const lesson = module.lessons.find(l => l.id === Number(lessonId));
     if (!lesson) {
-      throw new NotFoundException(`Lesson #${lessonId} not found in course #${courseId}`);
+      throw new NotFoundException(`Lesson #${lessonId} not found in module #${moduleId}`);
     }
   
-    const page = lesson.pages.id(pageId);
-    if (!page) {
-      throw new NotFoundException(`Page #${pageId} not found in lesson #${lessonId}`);
-    }
-  
-    lesson.pages.pull({ _id: pageId });
+    module.lessons.pull(lesson);
     await course.save();
     return course;
   }

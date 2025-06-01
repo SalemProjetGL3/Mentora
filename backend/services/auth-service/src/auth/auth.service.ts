@@ -1,7 +1,6 @@
-import { Injectable } from '@nestjs/common';
+import { Injectable, BadRequestException } from '@nestjs/common';
 import { UsersService } from '../users/user.service';
 import { JwtService } from '@nestjs/jwt';
-import { BadRequestException } from '@nestjs/common/exceptions';
 import * as bcrypt from 'bcryptjs';
 import { ConfigService } from '@nestjs/config';
 import { MailerService } from '../mailer/mailer.service';
@@ -19,12 +18,17 @@ export class AuthService {
   async register(email: string, password: string, username: string) {
     // Check if user already exists
     const existingUser = await this.usersService.findOneByEmail(email);
-    if (existingUser) throw new BadRequestException('Email already in use');
+    if (existingUser) {
+      return { errorMessage: 'User with this email already exists.' };
+    }
 
     // Generate verification token
     const verificationToken = this.jwtService.sign(
       { email },
-      { secret: this.configService.get('JWT_SECRET'), expiresIn: this.configService.get('JWT_EXPIRATION_TIME') },
+      { 
+        secret: this.configService.get('JWT_SECRET'), 
+        expiresIn: this.configService.get('JWT_EXPIRATION_TIME') 
+      }
     );
 
     // Hash the password and create user
@@ -50,7 +54,6 @@ export class AuthService {
     );
 
     return { 
-      message: 'Registration successful. Please check your email.', 
       token: clientSideToken 
     };  
   }
@@ -109,19 +112,19 @@ export class AuthService {
     if (!user.isVerified) {
       console.log('User is not verified, sending email...');
       await this.sendVerificationEmailToUser(user.email, user.verificationToken);
-      
+
       // Generate a client-side token for the user
       const clientSideToken = this.jwtService.sign(
         { email: user.email },
         {
           secret: this.configService.get('JWT_EMAIL_ONLY_SECRET'),
-          expiresIn: '30m' 
-        }
+          expiresIn: '30m',
+        },
       );
-     
+
       return {
-        message: 'User is not verified. A verification email has been sent.',
-        clientSideToken: clientSideToken
+        errorMessage: 'User is not verified. A verification email has been sent.',
+        clientSideToken: clientSideToken,
       };
     }
 
@@ -134,7 +137,7 @@ export class AuthService {
   // Validate user credentials (for login)
   async validateUser(email: string, password: string): Promise<any> {
     const user = await this.usersService.findOneByEmail(email);
-    console.log('User found in validateUser:', user);
+    // console.log('User found in validateUser:', user);
 
     if(!user) {
       console.log('User not found:', email);
@@ -158,5 +161,58 @@ export class AuthService {
     await this.sendVerificationEmailToUser(user.email, user.verificationToken);
 
     return { message: 'Verification email has been resent.' };
+  }
+
+  // Send password reset email
+  async sendPasswordResetEmail(email: string): Promise<boolean> {
+    const user = await this.usersService.findOneByEmail(email);
+    if (!user) {
+      return false; // User not found
+    }
+
+    const resetToken = this.jwtService.sign(
+      { email },
+      {
+        secret: this.configService.get<string>('JWT_SECRET'),
+        expiresIn: '1h', // Token valid for 1 hour
+      },
+    );
+
+    const resetUrl = `http://localhost:2000/reset-password?token=${resetToken}`;
+    await this.mailerService.sendPasswordResetEmail(email, resetUrl);
+
+    return true;
+  }
+
+  // Reset password
+  async resetPassword(token: string, newPassword: string): Promise<boolean> {
+    console.log('[resetPassword] Received token:', token);
+    console.log('[resetPassword] Received new password:', newPassword);
+
+    try {
+      const payload = this.jwtService.verify(token, {
+        secret: this.configService.get<string>('JWT_SECRET'),
+      });
+      console.log('[resetPassword] Token payload:', payload);
+
+      const user = await this.usersService.findOneByEmail(payload.email);
+      if (!user) {
+        console.log('[resetPassword] User not found for email:', payload.email);
+        throw new BadRequestException('Invalid token');
+      }
+
+      console.log('[resetPassword] User found:', user);
+
+      const hashedPassword = await bcrypt.hash(newPassword, 10);
+      console.log('[resetPassword] Hashed new password:', hashedPassword);
+
+      await this.usersService.updatePassword(user.email, hashedPassword);
+      console.log('[resetPassword] Password updated successfully for user:', user.email);
+
+      return true;
+    } catch (error) {
+      console.error('[resetPassword] Error occurred:', error.message);
+      return false; // Invalid or expired token
+    }
   }
 }

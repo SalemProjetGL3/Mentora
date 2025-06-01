@@ -55,4 +55,17 @@ export class UsersService {
   async deleteUser(email: string): Promise<void> {
     await this.userRepository.delete({ email });
   }
+
+  // Update a user's password
+  async updatePassword(email: string, newPassword: string): Promise<void> {
+    const user = await this.findOneByEmail(email);
+    if (!user) {
+      throw new Error('User not found');
+    }
+
+    user.password = newPassword;
+
+    // Use the repository's save method to persist the changes
+    await this.userRepository.save(user);
+  }
 }

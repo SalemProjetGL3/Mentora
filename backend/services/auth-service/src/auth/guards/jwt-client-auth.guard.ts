@@ -1,4 +1,4 @@
-import { Injectable, CanActivate, ExecutionContext, UnauthorizedException } from '@nestjs/common';
+import { Injectable, CanActivate, ExecutionContext } from '@nestjs/common';
 import { JwtService } from '@nestjs/jwt';
 import { ConfigService } from '@nestjs/config';
 import { UsersService } from 'src/users/user.service';
@@ -16,7 +16,8 @@ export class JwtClientGuard implements CanActivate {
     const authHeader = request.headers.authorization;
 
     if (!authHeader || !authHeader.startsWith('Bearer ')) {
-      throw new UnauthorizedException('Authorization header missing or malformed');
+      request.error = 'Authorization header missing or malformed';
+      return false;
     }
 
     const token = authHeader.split(' ')[1];
@@ -26,14 +27,22 @@ export class JwtClientGuard implements CanActivate {
       const decoded = this.jwtService.verify(token, { secret });
 
       if (!decoded.email) {
-        throw new UnauthorizedException('Invalid token payload: email missing');
+        request.error = 'Invalid token payload: email missing';
+        return false;
       }
 
       request.email = decoded.email;
       request.user = await this.usersService.findOneByEmail(decoded.email);
+
+      if (request.user && !request.user.isVerified) {
+        request.error = 'User email not verified';
+        return false;
+      }
+
       return true;
     } catch (err) {
-      throw new UnauthorizedException('Invalid or expired token');
+      request.error = 'Invalid or expired token';
+      return false;
     }
   }
 }
