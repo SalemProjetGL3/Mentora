@@ -3,10 +3,12 @@ import { UsersService } from './user.service';
 import { UsersController } from './user.controller';
 import { User } from './user.entity'; 
 import { TypeOrmModule } from '@nestjs/typeorm';
+import { AuthUtilsModule } from 'auth-utils';
 
 @Module({
   imports: [
-    TypeOrmModule.forFeature([User]),
+    AuthUtilsModule, // Importing AuthUtilsModule for JWT and roles decorators
+    TypeOrmModule.forFeature([User])
   ],
   providers: [UsersService],
   controllers: [UsersController],

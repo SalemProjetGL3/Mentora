@@ -1,13 +1,17 @@
 import { Injectable, OnModuleInit } from '@nestjs/common';
 import * as WebSocket from 'ws';
+import { ConfigService } from '@nestjs/config';
 
 @Injectable()
 export class AppService implements OnModuleInit {
   private ws: WebSocket;
   private lastResponseResolver: ((value: string) => void) | null = null;
 
+  constructor(private configService: ConfigService) {}
+
   onModuleInit() {
-    this.ws = new WebSocket.WebSocket(process.env.PYTHON_WS_URL);
+    const pythonWsUrl = this.configService.get<string>('PYTHON_WS_URL');
+    this.ws = new WebSocket.WebSocket(pythonWsUrl);
 
     this.ws.on('open', () => {
       console.log('✅ Connected to Python WebSocket service');
