@@ -1,4 +1,4 @@
-import { Injectable } from '@nestjs/common';
+import { HttpException, HttpStatus, Injectable } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
 import { ShopItem } from './schema/shop-item.schema';
 import { Model } from 'mongoose';
@@ -57,11 +57,17 @@ export class ShopService {
             throw new Error(`User rewards for userId ${userId} not found`);
         }
         if (userRewards.currentPoints < shopItem.cost) {
-            throw new Error(`Not enough points to buy item ${itemId}`);
-        }else{
+            throw new HttpException(
+                { message: 'Not enough points.' },
+                HttpStatus.BAD_REQUEST
+            );
+        } else {
             if (userInventory.ownedItems.includes(itemId)) {
-                throw new Error(`Item ${itemId} already owned by user ${userId}`);
-            }else{
+                throw new HttpException(
+                    { message: 'Item already owned.' },
+                    HttpStatus.BAD_REQUEST
+                );
+            } else {
                 userRewards.currentPoints -= shopItem.cost;
                 await userRewards.save();
                 userInventory.ownedItems.push(itemId);

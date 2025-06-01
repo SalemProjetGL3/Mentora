@@ -11,8 +11,7 @@ RUN npm install
 # Copier le reste du code
 COPY . .
 
-# Copier fichier .env dans auth-service/
-COPY .env .env
+
 
 
 # Exposer le port 3000

@@ -15,7 +15,9 @@ import { ShopModule } from './shop/shop.module';
       LeaderboardModule,     
       ConfigModule.forRoot({
         isGlobal: true,
-        envFilePath: join(__dirname, '../../../.env'),
+        envFilePath: 
+        join(__dirname, '../../.env')
+      
       }),
       MongooseModule.forRootAsync({
         imports: [ConfigModule],

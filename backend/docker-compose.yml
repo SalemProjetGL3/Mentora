@@ -25,7 +25,7 @@ services:
     build: ./services/auth-service
     container_name: auth_service
     env_file:
-      - ./services/auth-service/.env
+      - ./.env
     ports:
       - "3001:3000"
     environment:
@@ -57,33 +57,31 @@ services:
     depends_on:
       - mongo
 
-  roadmap-service:
-    build: ./services/roadmap-service
-    container_name: roadmap_service
-    env_file:
-      - ./services/roadmap-service/.env
-    ports:
-      - "3004:3000"
-    environment:
-      - MONGO_URI=${MONGO_URI}
-    depends_on:
-      - mongo
 
-  chatbot-service:
-    build: ./services/chatbot-service
-    container_name: chatbot_service
-    env_file:
-      - ./services/chatbot-service/.env
-    ports:
-      - "3005:3010"
+  # chatbot-service:
+  #   build: ./services/chatbot-service
+  #   container_name: chatbot_service
+  #   env_file:
+  #     - ./services/.env
+  #   ports:
+  #     - "3005:3010"
 
   quiz-service:
     build: ./services/quiz-service
     container_name: quiz_service
-    env_file:
-      - ./services/quiz-service/.env
     ports:
       - "3006:3000"
+    environment:
+      - MONGO_URI=${MONGO_URI}
+    depends_on:
+      - mongo
+  gamification-service:
+    build: ./services/gamification-service
+    container_name: gamification_service
+    ports:
+      - "3009:3000"
+    environment:
+      - MONGO_URI=${MONGO_URI}
     depends_on:
       - mongo
 
