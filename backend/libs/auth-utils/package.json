@@ -1,0 +1,26 @@
+{
+  "name": "auth-utils",
+  "version": "1.0.0",
+  "description": "",
+  "main": "dist/index.js",
+  "types": "dist/index.d.ts",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "build": "nest build"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "type": "commonjs",
+  "dependencies": {
+    "@nestjs/common": "^10.0.0",
+    "@nestjs/config": "^3.0.0",
+    "@nestjs/jwt": "^10.0.0",
+    "@nestjs/passport": "^10.0.0",
+    "@types/passport-jwt": "^4.0.0",
+    "auth-utils": "file:",
+    "jsonwebtoken": "^9.0.0",
+    "passport": "^0.4.1",
+    "passport-jwt": "^4.0.1"
+  }
+}

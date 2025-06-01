@@ -97,18 +97,17 @@ export class AuthService {
   }
 
   // Login user
-  async login(user: any, rememberMe: boolean) {
-    const payload = { username: user.username, email: user.email };
+  async login(user: any) {
+    if (!user) {
+      return { message: 'Invalid credentials or user not found.' };
+    }
 
-    // Set token expiration based on "Remember Me"
-    const expiresIn = rememberMe
-      ? '7d' // 7 days for "Remember Me"
-      : '1h'; // 1 hour for default session
-
-    const token = this.jwtService.sign(payload, {
-      expiresIn,
-      secret: this.configService.get<string>('JWT_SECRET'),
-    });
+    const payload = { 
+      sub: user.id,  // Use numeric ID
+      username: user.username, 
+      email: user.email 
+    };
+    const token = this.jwtService.sign(payload);
 
     if (!user.isVerified) {
       console.log('User is not verified, sending email...');
@@ -138,7 +137,7 @@ export class AuthService {
   // Validate user credentials (for login)
   async validateUser(email: string, password: string): Promise<any> {
     const user = await this.usersService.findOneByEmail(email);
-    console.log('User found in validateUser:', user);
+    // console.log('User found in validateUser:', user);
 
     if(!user) {
       console.log('User not found:', email);

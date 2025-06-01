@@ -15,7 +15,7 @@ export class AuthController {
     @Body('rememberMe') rememberMe: boolean,
     @Res({ passthrough: true }) res: Response,
   ) {
-    const token = await this.authService.login(req.user, rememberMe);
+    const token = await this.authService.login(req.user);
 
     // Set the token in a cookie
     res.cookie('token', token.token, {

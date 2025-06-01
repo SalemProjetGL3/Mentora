@@ -15,11 +15,25 @@ export class UpdateUserInput {
   password?: string;
 
   @Field({ nullable: true })
+  firstName?: string;
+
+  @Field({ nullable: true })
+  lastName?: string;
+
+  @Field({ nullable: true })
+  bio?: string;
+
+  @Field({ nullable: true })
+  jobTitle?: string;
+
+  @Field({ nullable: true })
+  company?: string;
+
+  @Field({ nullable: true })
   role?: string;
 
-  @Field({ nullable: true })
-  isVerified?: boolean;
 
-  @Field({ nullable: true })
-  verificationToken?: string;
+
+  @Field(() => [String], { nullable: 'itemsAndList' })
+  enrolledCourseIds?: string[];
 }

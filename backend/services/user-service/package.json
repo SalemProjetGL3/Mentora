@@ -29,6 +29,7 @@
     "@nestjs/platform-express": "^11.0.1",
     "@nestjs/typeorm": "^11.0.0",
     "axios": "^1.8.4",
+    "class-validator": "^0.14.2",
     "graphql": "^16.10.0",
     "mentora": "file:",
     "mysql2": "^3.14.0",

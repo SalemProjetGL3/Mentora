@@ -1,4 +1,4 @@
-import { Module, NestModule, MiddlewareConsumer } from '@nestjs/common';
+import { Module, NestModule, MiddlewareConsumer, forwardRef } from '@nestjs/common';
 import { AuthService } from './auth.service';
 import { AuthController } from './auth.controller';
 import { PassportModule } from '@nestjs/passport';
@@ -10,6 +10,7 @@ import { LocalStrategy } from './strategies/local.strategy';
 import { SessionMiddleware } from './middlewares/session.middleware';
 import { SessionSerializer } from './serializers/session.serializer';
 import { MailerModule } from '../mailer/mailer.module';
+import { User } from 'src/users/user.entity';
 
 @Module({
   imports: [
@@ -23,9 +24,8 @@ import { MailerModule } from '../mailer/mailer.module';
       }),
       inject: [ConfigService],
     }), 
-
     UsersModule,
-    MailerModule
+    MailerModule,
   ],
   providers: [AuthService, LocalStrategy, JwtStrategy, SessionSerializer],
   controllers: [AuthController],
@@ -33,7 +33,6 @@ import { MailerModule } from '../mailer/mailer.module';
 })
 export class AuthModule implements NestModule {
   configure(consumer: MiddlewareConsumer) {
-    // Apply the session middleware globally within the auth module
     consumer.apply(SessionMiddleware).forRoutes('auth/*');
   }
 }
