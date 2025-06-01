@@ -19,9 +19,11 @@ export class UserResolver {
   }
 
 @Query(() => User, { name: 'me' })
-async getCurrentUser(): Promise<User> {
-
-  const userId = 1; 
+async getCurrentUser(@Context() context: any): Promise<User> {
+  const userId = context.req.user?.id;
+  if (!userId) {
+    throw new Error('User not authenticated');
+  }
   return this.userService.findOne(userId);
 }
 
