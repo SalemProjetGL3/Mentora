@@ -3,9 +3,9 @@ import { Controller, Get, Post, Body, Param, Patch, Delete } from '@nestjs/commo
 import { CourseService } from './course.service';
 import { CreateCourseDto } from './dto/create-course.dto';
 import { UpdateCourseDto } from './dto/update-course.dto';
+import { CreateModuleDto } from './dto/create-module.dto';
+import { UpdateModuleDto } from './dto/update-module.dto';
 import { CreateLessonDto } from './dto/create-lesson.dto';
-import { UpdateLessonDto } from './dto/update-lesson.dto';
-import { CreatePageDto } from './dto/create-page.dto';
 
 @Controller('courses')
 export class CourseController {
@@ -36,49 +36,49 @@ export class CourseController {
     return this.courseService.remove(id);
   }
 
-  // --- Lessons Management ---
-  @Post(':courseId/lessons')
-  addLesson(
+  // --- Modules Management ---
+  @Post(':courseId/modules')
+  addModule(
     @Param('courseId') courseId: string,
+    @Body() dto: CreateModuleDto,
+  ) {
+    return this.courseService.addModule(courseId, dto);
+  }
+
+  @Patch(':courseId/modules/:moduleId')
+  updateModule(
+    @Param('courseId') courseId: string,
+    @Param('moduleId') moduleId: string,
+    @Body() dto: UpdateModuleDto,
+  ) {
+    return this.courseService.updateModule(courseId, moduleId, dto);
+  }
+
+  @Delete(':courseId/modules/:moduleId')
+  removeModule(
+    @Param('courseId') courseId: string,
+    @Param('moduleId') moduleId: string,
+  ) {
+    return this.courseService.removeModule(courseId, moduleId);
+  }
+
+  // --- Lessons Management ---
+  @Post(':courseId/modules/:moduleId/lessons')
+  addLessonToModule(
+    @Param('courseId') courseId: string,
+    @Param('moduleId') moduleId: string,
     @Body() dto: CreateLessonDto,
   ) {
-    return this.courseService.addLesson(courseId, dto);
+    return this.courseService.addLessonToModule(courseId, moduleId, dto);
   }
 
-  @Patch(':courseId/lessons/:lessonId')
-  updateLesson(
-    @Param('courseId') courseId: string,
-    @Param('lessonId') lessonId: string,
-    @Body() dto: UpdateLessonDto,
-  ) {
-    return this.courseService.updateLesson(courseId, lessonId, dto);
-  }
-
-  @Delete(':courseId/lessons/:lessonId')
-  removeLesson(
-    @Param('courseId') courseId: string,
-    @Param('lessonId') lessonId: string,
-  ) {
-    return this.courseService.removeLesson(courseId, lessonId);
-  }
-
-  // --- Pages Management ---
-  @Post(':courseId/lessons/:lessonId/pages')
-  addPageToLesson(
-    @Param('courseId') courseId: string,
-    @Param('lessonId') lessonId: string,
-    @Body() dto: CreatePageDto,
-  ) {
-    return this.courseService.addPageToLesson(courseId, lessonId, dto);
-  }
-
-  @Delete(':courseId/lessons/:lessonId/pages/:pageId')
+  @Delete(':courseId/modules/:moduleId/lessons/:lessonId')
   removePageFromLesson(
     @Param('courseId') courseId: string,
+    @Param('moduleId') moduleId: string,
     @Param('lessonId') lessonId: string,
-    @Param('pageId') pageId: string,
   ) {
-    return this.courseService.removePageFromLesson(courseId, lessonId, pageId);
+    return this.courseService.removeLessonFromModule(courseId, moduleId, lessonId);
   }
 
 }

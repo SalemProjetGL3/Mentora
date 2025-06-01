@@ -27,15 +27,36 @@ export class User {
   })
   role: string;
 
-  @Field()
-  @Column({ default: false })
-  isVerified: boolean;
+  @Field({ nullable: true })
+  @Column({ nullable: true })
+  firstName?: string;
 
   @Field({ nullable: true })
   @Column({ nullable: true })
-  verificationToken: string;
+  lastName?: string;
+
+  @Field({ nullable: true })
+  @Column({ nullable: true })
+  bio?: string;
+
+  @Field({ nullable: true })
+  @Column({ nullable: true })
+  jobTitle?: string;
+
+  @Field({ nullable: true })
+  @Column({ nullable: true })
+  company?: string;
 
   @Field(() => [String], { nullable: true })
   @Column('simple-array', { nullable: true })
   enrolledCourseIds: string[];
+
+  @Field()
+  @Column({ default: false })
+  isVerified: boolean;
+
+  @Field(() => String, { nullable: true })
+  @Column({ type: 'varchar', nullable: true })
+  verificationToken: string | null;
+
 }

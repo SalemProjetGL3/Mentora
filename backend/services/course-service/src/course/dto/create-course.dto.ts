@@ -1,18 +1,35 @@
-import { IsString, IsOptional, ValidateNested, IsArray } from 'class-validator';
+import { IsString, IsEnum, IsNumber, IsOptional, ValidateNested, IsArray } from 'class-validator';
 import { Type } from 'class-transformer';
-import { CreateLessonDto } from './create-lesson.dto';
+import { CreateModuleDto } from './create-module.dto';
 
 export class CreateCourseDto {
+  @IsNumber()
+  id: number;
+
   @IsString()
   title: string;
 
-  @IsOptional()
   @IsString()
-  description?: string;
+  description: string;
 
   @IsOptional()
+  @IsString()
+  shortDescription?: string;
+
   @IsArray()
   @ValidateNested({ each: true })
-  @Type(() => CreateLessonDto)
-  lessons?: CreateLessonDto[];
+  @Type(() => CreateModuleDto)
+  modules: CreateModuleDto[];
+
+  @IsString()
+  duration: string;
+
+  @IsEnum(['Débutant', 'Intermédiaire', 'Avancé', 'Tous niveaux'])
+  level: 'Débutant' | 'Intermédiaire' | 'Avancé' | 'Tous niveaux';
+
+  @IsEnum(['Frontend', 'Backend', 'Fullstack'])
+  category: 'Frontend' | 'Backend' | 'Fullstack';
+
+  @IsString()
+  image: string;
 }

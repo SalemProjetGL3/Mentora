@@ -31,11 +31,11 @@ services:
     ports:
       - "3001:3000"
     environment:
-       DB_HOST: mysql
-       DB_PORT: ${DB_PORT}       
-       DB_USERNAME: ${DB_USERNAME}
-       DB_PASSWORD: ${MYSQL_ROOT_PASSWORD}
-       DB_NAME: ${DB_NAME}
+      DB_HOST: mysql
+      DB_PORT: ${DB_PORT}       # Assurez-vous que DB_PORT est défini (par défaut 3306)
+      DB_USERNAME: ${DB_USERNAME}
+      DB_PASSWORD: ${MYSQL_ROOT_PASSWORD}
+      DB_NAME: ${DB_NAME}
     depends_on:
       - mysql
 
@@ -53,46 +53,42 @@ services:
     depends_on:
       - mysql
 
-  course-service:
-    build: ./services/course-service
-    container_name: course_service
-    ports:
-      - "3003:3000"
-    environment:
-      - MONGO_URI=${MONGO_URI}
-    depends_on:
-      - mongo
+  # course-service:
+  #   build: ./services/course-service
+  #   container_name: course_service
+  #   ports:
+  #     - "3003:3000"
+  #   environment:
+  #     - MONGO_URI=${MONGO_URI}
+  #   depends_on:
+  #     - mongo
 
-  roadmap-service:
-    build: ./services/roadmap-service
-    container_name: roadmap_service
-    env_file:
-      - ./services/roadmap-service/.env
-    ports:
-      - "3004:3000"
-    environment:
-      - MONGO_URI=${MONGO_URI}
-    depends_on:
-      - mongo
+  # roadmap-service:
+  #   build: ./services/roadmap-service
+  #   container_name: roadmap_service
+  #   env_file:
+  #     - ./services/roadmap-service/.env
+  #   ports:
+  #     - "3004:3000"
+  #   environment:
+  #     - MONGO_URI=${MONGO_URI}
+  #   depends_on:
+  #     - mongo
 
-  chatbot-service:
-    build: ./services/chatbot-service
-    container_name: chatbot_service
-    env_file:
-      - ./services/chatbot-service/.env
-    ports:
-      - "3005:3010"
-
-  quiz-service:
-    build: ./services/quiz-service
-    container_name: quiz_service
-    env_file:
-      - ./services/quiz-service/.env
-    ports:
-      - "3006:3000"
-    depends_on:
-      - mongo
-
+  # chatbot-service:
+  #   build: ./services/chatbot-service
+  #   container_name: chatbot_service
+  #   env_file:
+  #     - ./services/chatbot-service/.env
+  #   ports:
+  #     - "3005:3010"
+  #   environment:
+  #     # Add any required environment variables here, for example:
+  #     # - PYTHON_WS_URL=ws://python-service:port
+  #     # - PORT=3010
+  #   depends_on:
+  #     # Add dependencies if needed, e.g.:
+  #     # - python-service
 
 volumes:
   mongo_data:
