@@ -54,7 +54,9 @@ services:
       - mysql
 
   course-service:
-    build: ./services/course-service
+    build: 
+      context: .
+      dockerfile: services/course-service/Dockerfile
     container_name: course_service
     ports:
       - "3003:3000"
