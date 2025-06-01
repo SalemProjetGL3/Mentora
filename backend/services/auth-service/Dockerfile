@@ -17,19 +17,19 @@ COPY libs/auth-utils ./libs/auth-utils
 
 # Build the shared library
 WORKDIR /usr/src/app/libs/auth-utils
-RUN npm install
 RUN npm install -g @nestjs/cli
+RUN npm install
 RUN npm run build
 
 # Build auth-service if needed
 WORKDIR /usr/src/app/services/auth-service
-RUN npm install
 RUN npm install -g @nestjs/cli
+RUN npm install
 RUN npm run build
-RUN npm run build && ls -la dist
+# RUN npm run build && ls -la dist
 
 # Expose port
 EXPOSE 3000
 
 # Start app
-CMD ["node", "/usr/src/app/dist/services/auth-service/main"]
+CMD ["npm", "run", "start"]

@@ -45,11 +45,5 @@ export class User {
   @Column({ type: 'varchar', nullable: true })
   verificationToken: string | null;
 
-  @Column({
-    type: 'enum',
-    enum: ['USER', 'ADMIN'],
-    default: 'USER'
-  })
-  role: string;
 }
 
