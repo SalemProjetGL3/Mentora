@@ -33,7 +33,6 @@ import { User } from 'src/users/user.entity';
 })
 export class AuthModule implements NestModule {
   configure(consumer: MiddlewareConsumer) {
-    // Apply the session middleware globally within the auth module
     consumer.apply(SessionMiddleware).forRoutes('auth/*');
   }
 }

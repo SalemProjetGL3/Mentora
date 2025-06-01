@@ -26,7 +26,6 @@ WORKDIR /usr/src/app/services/auth-service
 RUN npm install -g @nestjs/cli
 RUN npm install
 RUN npm run build
-# RUN npm run build && ls -la dist
 
 # Expose port
 EXPOSE 3000
