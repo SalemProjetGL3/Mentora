@@ -9,14 +9,13 @@ export class SessionSerializer extends PassportSerializer {
   }
 
   serializeUser(user: any, done: Function) {
-    // For MySQL, user.id is likely a number or string
     if (!user || !user.id) {
       return done(new Error('User not found'), null);
     }
-    done(null, user.id); // Store numeric/string ID in session
+    done(null, user.id); // Store numeric ID in session
   }
 
-  async deserializeUser(userId: string | string, done: Function) {
+  async deserializeUser(userId: number, done: Function) {
     try {
       const user = await this.usersService.findById(userId);
       if (!user) {

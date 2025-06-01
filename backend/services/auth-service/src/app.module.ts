@@ -4,6 +4,7 @@ import { join } from 'path';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { ConfigModule, ConfigService } from '@nestjs/config';
 import sessionConfig from './auth/config/session.config';
+import { TypeOrmModuleOptions } from '@nestjs/typeorm';
 
 @Module({
   imports: [
@@ -11,8 +12,9 @@ import sessionConfig from './auth/config/session.config';
     ConfigModule.forRoot({
       isGlobal: true,
       envFilePath: [
-        join(__dirname, '../../.env'),
+        join(__dirname, '../../../.env'),
         join(__dirname, '../.env'),
+        join(__dirname, '../../.env'),
       ],
       load: [sessionConfig],
     }),
@@ -21,16 +23,49 @@ import sessionConfig from './auth/config/session.config';
     TypeOrmModule.forRootAsync({
       imports: [ConfigModule],
       inject: [ConfigService],
-      useFactory: (config: ConfigService) => ({
-        type: 'mysql',
-        host: config.get<string>('DB_HOST'),
-        port: config.get<number>('DB_PORT'),
-        username: config.get<string>('DB_USERNAME'),
-        password: config.get<string>('DB_PASSWORD'),
-        database: config.get<string>('DB_NAME'),
-        autoLoadEntities: true,
-        synchronize: true, 
-      }),
+      useFactory: (config: ConfigService): TypeOrmModuleOptions => {
+        const host = config.get<string>('DB_HOST');
+        const port = config.get<number>('DB_PORT');
+        const username = config.get<string>('DB_USERNAME');
+        const password = config.get<string>('DB_PASSWORD');
+        const database = config.get<string>('DB_NAME');
+
+        // Validate required configuration
+        if (!host || !port || !username || !password || !database) {
+          throw new Error(
+            `Database configuration error. Missing required values:
+            Host: ${host ? '✓' : '✗'}
+            Port: ${port ? '✓' : '✗'}
+            Username: ${username ? '✓' : '✗'}
+            Password: ${password ? '✓' : '✗'}
+            Database: ${database ? '✓' : '✗'}`
+          );
+        }
+
+        // Create and return the database configuration
+        const dbConfig: TypeOrmModuleOptions = {
+          type: 'mysql',
+          host,
+          port,
+          username,
+          password,
+          database,
+          autoLoadEntities: true,
+          synchronize: true,
+        };
+
+        // Log configuration (without sensitive data)
+        console.log('Database configuration loaded:', {
+          host,
+          port,
+          username,
+          database,
+          autoLoadEntities: true,
+          synchronize: true,
+        });
+
+        return dbConfig;
+      },
     }),
 
     AuthModule

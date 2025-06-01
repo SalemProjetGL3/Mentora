@@ -99,7 +99,11 @@ export class AuthService {
       return { message: 'Invalid credentials or user not found.' };
     }
 
-    const payload = { username: user.username, email: user.email };
+    const payload = { 
+      sub: user.id,  // Use numeric ID
+      username: user.username, 
+      email: user.email 
+    };
     const token = this.jwtService.sign(payload);
 
     if (!user.isVerified) {

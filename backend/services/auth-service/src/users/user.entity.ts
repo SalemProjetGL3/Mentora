@@ -2,8 +2,11 @@ import { Entity, Column, PrimaryGeneratedColumn } from 'typeorm';
 
 @Entity()
 export class User {
-  @PrimaryGeneratedColumn('uuid')
-  id: string;
+  @PrimaryGeneratedColumn()
+  id: number;
+
+  @Column({ unique: true })
+  username: string;
 
   @Column({ unique: true })
   email: string;
@@ -11,8 +14,30 @@ export class User {
   @Column()
   password: string;
 
-  @Column({ unique: false })
-  username: string;
+  @Column({
+    type: 'enum',
+    enum: ['USER', 'ADMIN'],
+    default: 'USER'
+  })
+  role: string;
+
+  @Column({ nullable: true })
+  firstName?: string;
+
+  @Column({ nullable: true })
+  lastName?: string;
+
+  @Column({ nullable: true })
+  bio?: string;
+
+  @Column({ nullable: true })
+  jobTitle?: string;
+
+  @Column({ nullable: true })
+  company?: string;
+
+  @Column('simple-array', { nullable: true })
+  enrolledCourseIds: string[];
 
   @Column({ default: false })
   isVerified: boolean;
@@ -20,3 +45,4 @@ export class User {
   @Column({ type: 'varchar', nullable: true })
   verificationToken: string | null;
 }
+

@@ -2,6 +2,11 @@ type User {
   id: ID!
   username: String!
   email: String!
+  firstName: String
+  lastName: String
+  bio: String
+  jobTitle: String
+  company: String
   role: String!
   isVerified: Boolean!
   verificationToken: String
@@ -12,9 +17,15 @@ input CreateUserInput {
   username: String!
   email: String!
   password: String!
+  firstName: String
+  lastName: String
+  bio: String
+  jobTitle: String
+  company: String
   role: String
   isVerified: Boolean
   verificationToken: String
+  enrolledCourseIds: [String!]
 }
 
 input UpdateUserInput {
@@ -22,15 +33,27 @@ input UpdateUserInput {
   username: String
   email: String
   password: String
+  firstName: String
+  lastName: String
+  bio: String
+  jobTitle: String
+  company: String
   role: String
   isVerified: Boolean
   verificationToken: String
+  enrolledCourseIds: [String!]
 }
 
 type Query {
   users: [User!]!
   user(id: ID!): User
   userEnrolledCourses(userId: ID!): [String!]
+}
+type Query {
+  users: [User!]!
+  user(id: ID!): User
+  userEnrolledCourses(userId: ID!): [String!]
+  me: User       
 }
 
 type Mutation {
