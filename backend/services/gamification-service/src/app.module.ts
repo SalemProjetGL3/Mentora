@@ -14,8 +14,11 @@ import { ShopModule } from './shop/shop.module';
   imports: [PointsModule, 
       LeaderboardModule,     
       ConfigModule.forRoot({
-        isGlobal: true,
-        envFilePath: join(__dirname, '../../../.env'),
+      isGlobal: true,
+        envFilePath: [
+          join(__dirname, '../../.env'),
+          join(__dirname, '../.env'),
+        ]
       }),
       MongooseModule.forRootAsync({
         imports: [ConfigModule],

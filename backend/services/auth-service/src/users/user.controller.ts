@@ -15,7 +15,7 @@ export class UsersController {
   }
 
   // Optional: Endpoint to get all users (for testing purposes)
-  @Roles('ADMIN') // Assuming you have a RolesGuard set up
+  @Roles('ADMIN') 
   @UseGuards(JwtAuthGuard, RolesGuard)
   @Get()
   async findAll() {
