@@ -1,14 +1,42 @@
-import { IsString, IsOptional, IsArray, ValidateNested } from 'class-validator';
-import { Type } from 'class-transformer';
-import { CreatePageDto } from './create-page.dto';
+import { IsString, IsOptional, IsBoolean, IsEnum, IsNumber, IsArray } from 'class-validator';
 
 export class CreateLessonDto {
+  @IsNumber()
+  id: number;
+
   @IsString()
   title: string;
 
+  @IsEnum(['video', 'text', 'code', 'quiz'])
+  type: 'video' | 'text' | 'code' | 'quiz';
+
+  @IsOptional()
+  @IsString()
+  content?: string;
+
+  @IsOptional()
+  @IsString()
+  description?: string;
+
+  @IsString()
+  duration: string;
+
   @IsOptional()
   @IsArray()
-  @ValidateNested({ each: true })
-  @Type(() => CreatePageDto)
-  pages?: CreatePageDto[];
+  @IsString({ each: true })
+  images?: string[];
+
+  @IsOptional()
+  @IsString()
+  videoUrl?: string;
+
+  @IsOptional()
+  @IsString()
+  quizId?: string;
+
+  @IsBoolean()
+  completed: boolean;
+
+  @IsNumber()
+  order: number;
 }

@@ -14,9 +14,10 @@ export class ProgressService {
   ) {}
 
   async getUserProgress(userId: string, courseId: string): Promise<Progress> {
-    const progress = await this.progressModel.findOne({ userId, courseId }).exec();
+    const progress = await this.progressModel.findOne({ userId, courseId: Number(courseId) }).exec();
     if (!progress) {
-      throw new NotFoundException(`No progress found for user ${userId} on course ${courseId}`);
+      let newprogress= this.initProgress(userId, courseId); 
+      return newprogress;
     }
     return progress;
   }
@@ -32,15 +33,16 @@ export class ProgressService {
         userId,
         courseId,
         startedAt: new Date(),
-        completedPages: [],
         completedLessons: [],
+        completedModules: [],
         completedAssessments: [],
+        progressRate: 0
       });
     }
   
     // Ajouter la page complétée
-    if (dto.completedPageId && !progress.completedPages.includes(dto.completedPageId)) {
-      progress.completedPages.push(dto.completedPageId);
+    if (dto.completedLessonId && !progress.completedLessons.includes(dto.completedLessonId)) {
+      progress.completedLessons.push(dto.completedLessonId);
     }
   
     // Ajouter le quiz complété
@@ -54,20 +56,20 @@ export class ProgressService {
       throw new NotFoundException(`Course #${courseId} not found`);
     }
   
-    // Réinitialiser les leçons complétées
-    progress.completedLessons = [];
+    // Réinitialiser les module complétées
+    progress.completedModules = [];
   
-    for (const lesson of course.lessons) {
-      const allPageIds = lesson.pages.map(p => p._id.toString());
-      const allPagesCompleted = allPageIds.every(pid => progress.completedPages.includes(pid));
-      if (allPagesCompleted) {
-        progress.completedLessons.push(lesson._id.toString());
+    for (const module of course.modules) {
+      const allLessonIds = module.lessons.map(l => l.id.toString());
+      const allLessonsCompleted = allLessonIds.every(pid => progress.completedLessons.includes(pid));
+      if (allLessonsCompleted) {
+        progress.completedLessons.push(module.id.toString());
       }
     }
   
     // Calcul du taux de progression :
-    const totalUnits = course.lessons.length + progress.completedAssessments.length; // 1 unité par leçon + 1 par quiz complété
-    const completedUnits = progress.completedLessons.length + progress.completedAssessments.length;
+    const totalUnits = course.modules.length + progress.completedAssessments.length; // 1 unité par module + 1 par quiz complété
+    const completedUnits = progress.completedModules.length + progress.completedAssessments.length;
   
     let newRate = 0;
     if (totalUnits > 0) {
@@ -90,6 +92,7 @@ export class ProgressService {
       progress = new this.progressModel({
         userId,
         courseId,
+        completedModules: [],
         completedLessons: [],
         completedAssessments: [],
         progressRate: 0,
