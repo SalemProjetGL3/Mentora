@@ -3,6 +3,7 @@ import { QuizService } from './quiz.service';
 import { CreateQuizDto } from './dto/create-quiz.dto';
 import { UpdateQuizDto } from './dto/update-quiz.dto';
 import { QuizSubmissionDto } from './dto/submit-answer.dto';
+import { JwtAuthGuard, RolesGuard, Roles } from 'auth-utils';
 
 @Controller('quizzes')
 export class QuizController {

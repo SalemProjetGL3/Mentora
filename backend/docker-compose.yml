@@ -65,6 +65,30 @@ services:
     depends_on:
       - mongo
 
+  quiz-service:
+    build: 
+      context: .
+      dockerfile: services/quiz-service/Dockerfile
+    container_name: quiz_service
+    ports:
+      - "3004:3000"
+    environment:
+      - MONGO_URI=${MONGO_URI}
+    depends_on:
+      - mongo
+
+  gamification-service:
+    build: 
+      context: .
+      dockerfile: services/gamification-service/Dockerfile
+    container_name: gamification_service
+    ports:
+      - "3009:3000"
+    environment:
+      - MONGO_URI=${MONGO_URI}
+    depends_on:
+      - mongo
+
   # roadmap-service:
   #   build: ./services/roadmap-service
   #   container_name: roadmap_service
