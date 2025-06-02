@@ -40,7 +40,9 @@ services:
       - mysql
 
   user-service:
-    build: ./services/user-service
+    build: 
+      context: .
+      dockerfile: services/user-service/Dockerfile
     container_name: user_service
     ports:
       - "3002:3002"
@@ -53,15 +55,15 @@ services:
     depends_on:
       - mysql
 
-  # course-service:
-  #   build: ./services/course-service
-  #   container_name: course_service
-  #   ports:
-  #     - "3003:3000"
-  #   environment:
-  #     - MONGO_URI=${MONGO_URI}
-  #   depends_on:
-  #     - mongo
+  course-service:
+    build: ./services/course-service
+    container_name: course_service
+    ports:
+      - "3003:3000"
+    environment:
+      - MONGO_URI=${MONGO_URI}
+    depends_on:
+      - mongo
 
   # roadmap-service:
   #   build: ./services/roadmap-service

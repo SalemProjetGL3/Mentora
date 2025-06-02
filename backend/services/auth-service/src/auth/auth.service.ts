@@ -103,10 +103,13 @@ export class AuthService {
     }
 
     const payload = { 
-      sub: user.id,  // Use numeric ID
-      username: user.username, 
-      email: user.email 
-    };
+  id: user.id,                  
+  username: user.username, 
+  email: user.email,
+  role: user.role,              
+};
+console.log('[AUTH SERVICE] JWT_SECRET used for signing:', this.configService.get('JWT_SECRET'));
+
     const token = this.jwtService.sign(payload);
 
     if (!user.isVerified) {

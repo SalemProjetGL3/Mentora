@@ -1,9 +1,10 @@
 import { Resolver, Query, Mutation, Args, ID, Context } from '@nestjs/graphql';
 import { UserService } from './user.service';
+import { UseGuards } from '@nestjs/common';
 import { User } from './user.entity';
 import { CreateUserInput } from './dto/create-user.input';
 import { UpdateUserInput } from './dto/update-user.input';
-
+import { GqlAuthGuard } from 'auth-utils';
 @Resolver(() => User)
 export class UserResolver {
   constructor(private readonly userService: UserService) {}
@@ -17,7 +18,7 @@ export class UserResolver {
   async user(@Args('id', { type: () => ID }) id: number): Promise<User> {
     return this.userService.findOne(id);
   }
-
+@UseGuards(GqlAuthGuard)
 @Query(() => User, { name: 'me' })
 async getCurrentUser(@Context() context: any): Promise<User> {
   const userId = context.req.user?.id;

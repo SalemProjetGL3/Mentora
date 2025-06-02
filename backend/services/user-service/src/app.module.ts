@@ -6,6 +6,7 @@ import { ApolloDriver, ApolloDriverConfig } from '@nestjs/apollo';
 import { UserModule } from './user/user.module';
 import { User } from './user/user.entity';
 import { join } from 'path';
+import { AuthUtilsModule } from 'auth-utils';
 
 @Module({
   imports: [
@@ -13,6 +14,7 @@ import { join } from 'path';
       isGlobal: true,
       envFilePath: join(__dirname, '../../../.env'),
     }),
+    AuthUtilsModule,
     TypeOrmModule.forRootAsync({
       imports: [ConfigModule],
       useFactory: (configService: ConfigService) => ({
