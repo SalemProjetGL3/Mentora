@@ -9,34 +9,40 @@ import { JwtAuthGuard, RolesGuard, Roles } from 'auth-utils';
 export class QuizController {
   constructor(private readonly quizService: QuizService) {}
 
+  // Endpoint to create a new quiz
   @Post()
   @UsePipes(new ValidationPipe({ whitelist: true, forbidNonWhitelisted: true }))
   create(@Body() createQuizDto: CreateQuizDto) {
     return this.quizService.create(createQuizDto);
   }
 
+  // Endpoint to get all quizzes  
   @Get()
   findAll() {
     return this.quizService.findAll();
   }
 
+  // Endpoint to get a quiz by ID, with an optional query parameter to populate questions
   @Get(':id')
   findOne(@Param('id') id: string, @Query('populate') populate?: string) {
     const populateQuestions = populate === 'true';
     return this.quizService.findOne(id, populateQuestions);
   }
 
+  // Endpoint to update a quiz by ID
   @Patch(':id')
   @UsePipes(new ValidationPipe({ whitelist: true, forbidNonWhitelisted: true }))
   update(@Param('id') id: string, @Body() updateQuizDto: UpdateQuizDto) {
     return this.quizService.update(id, updateQuizDto);
   }
 
+  // Endpoint to delete a quiz by ID
   @Delete(':id')
   remove(@Param('id') id: string) {
     return this.quizService.remove(id);
   }
 
+  // Endpoint to submit answers for a specific quiz question
   @Post(':id/submit') // Endpoint to submit answers for a whole quiz
   @UsePipes(new ValidationPipe({ whitelist: true, forbidNonWhitelisted: true }))
   submitAnswers(@Param('id') quizId: string, @Body() submissionDto: QuizSubmissionDto) {
