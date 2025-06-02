@@ -1,13 +1,13 @@
 # version: "3.8"
 
 services:
-  mongo:
-    image: mongo:5.0
-    container_name: mentora_mongo
-    ports:
-      - "27017:27017"
-    volumes:
-      - mongo_data:/data/db
+  # mongo:
+  #   image: mongo:5.0
+  #   container_name: mentora_mongo
+  #   ports:
+  #     - "27017:27017"
+  #   volumes:
+  #     - mongo_data:/data/db
 
   mysql:
     image: mysql:8.0
@@ -44,26 +44,28 @@ services:
       context: .
       dockerfile: services/user-service/Dockerfile
     container_name: user_service
+    env_file:
+      - ./.env
     ports:
       - "3002:3002"
     environment:
       DB_HOST: mysql
-      DB_PORT: ${DB_PORT}       # Assurez-vous que DB_PORT est défini (par défaut 3306)
+      DB_PORT: ${DB_PORT}       
       DB_USERNAME: ${DB_USERNAME}
       DB_PASSWORD: ${MYSQL_ROOT_PASSWORD}
       DB_NAME: ${DB_NAME}
     depends_on:
       - mysql
 
-  course-service:
-    build: ./services/course-service
-    container_name: course_service
-    ports:
-      - "3003:3000"
-    environment:
-      - MONGO_URI=${MONGO_URI}
-    depends_on:
-      - mongo
+  # course-service:
+  #   build: ./services/course-service
+  #   container_name: course_service
+  #   ports:
+  #     - "3003:3000"
+  #   environment:
+  #     - MONGO_URI=${MONGO_URI}
+  #   depends_on:
+  #     - mongo
 
   # roadmap-service:
   #   build: ./services/roadmap-service
@@ -93,5 +95,5 @@ services:
   #     # - python-service
 
 volumes:
-  mongo_data:
+  # mongo_data:
   mysql_data:

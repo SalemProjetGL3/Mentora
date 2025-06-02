@@ -32,7 +32,11 @@ export class UpdateUserInput {
   @Field({ nullable: true })
   role?: string;
 
+  @Field({ nullable: true })          
+  isVerified?: boolean;                
 
+  @Field({ nullable: true })        
+  verificationToken?: string;        
 
   @Field(() => [String], { nullable: 'itemsAndList' })
   enrolledCourseIds?: string[];

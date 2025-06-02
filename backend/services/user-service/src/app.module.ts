@@ -12,7 +12,10 @@ import { AuthUtilsModule } from 'auth-utils';
   imports: [
     ConfigModule.forRoot({
       isGlobal: true,
-      envFilePath: join(__dirname, '../../../.env'),
+      envFilePath: [
+        join(__dirname, '../../../.env'),
+        join(__dirname, '../.env')
+      ],
     }),
     AuthUtilsModule,
     TypeOrmModule.forRootAsync({
@@ -32,6 +35,7 @@ import { AuthUtilsModule } from 'auth-utils';
     GraphQLModule.forRoot<ApolloDriverConfig>({
       driver: ApolloDriver,
       autoSchemaFile: true,
+      csrfPrevention: false,
     }),
     UserModule,
   ],

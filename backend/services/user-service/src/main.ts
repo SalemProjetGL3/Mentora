@@ -6,10 +6,16 @@ async function bootstrap() {
   app.use(cookieParser());
   
   app.enableCors({
-    origin: 'http://localhost:2000',
+    origin: ['http://localhost:2000'],
     credentials: true,
-    methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
-    allowedHeaders: ['Content-Type', 'Authorization'],
+    allowedHeaders: [
+      'Content-Type',
+      'Accept',
+      'Authorization',
+      'x-apollo-operation-name', 
+      'apollo-require-preflight', 
+    ],
+    methods: ['GET', 'POST', 'OPTIONS'],
   });
 
   await app.listen(3002);
