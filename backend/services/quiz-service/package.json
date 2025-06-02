@@ -34,7 +34,8 @@
     "gamification-service": "file:",
     "mongoose": "^8.15.1",
     "reflect-metadata": "^0.2.2",
-    "rxjs": "^7.8.1"
+    "rxjs": "^7.8.1",
+    "auth-utils": "file:../../libs/auth-utils"
   },
   "devDependencies": {
     "@eslint/eslintrc": "^3.2.0",
