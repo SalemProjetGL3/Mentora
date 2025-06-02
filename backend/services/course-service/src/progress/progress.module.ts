@@ -6,6 +6,7 @@ import { ProgressService } from './progress.service';
 import { Progress, ProgressSchema } from './schemas/progress.schema';
 // On a besoin d'accéder au Course pour calculer la progression
 import { Course, CourseSchema } from '../course/schemas/course.schema';
+import { AuthUtilsModule } from 'auth-utils'; 
 
 @Module({
   imports: [
@@ -13,6 +14,7 @@ import { Course, CourseSchema } from '../course/schemas/course.schema';
       { name: Progress.name, schema: ProgressSchema },
       { name: Course.name, schema: CourseSchema },
     ]),
+    AuthUtilsModule, 
   ],
   controllers: [ProgressController],
   providers: [ProgressService],

@@ -27,7 +27,7 @@ services:
       dockerfile: services/auth-service/Dockerfile
     container_name: auth_service
     env_file:
-      - ./services/auth-service/.env
+      - ./.env
     ports:
       - "3000:3000"
     environment:

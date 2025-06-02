@@ -11,7 +11,6 @@ RUN npm install
 # Copier le reste du code
 COPY . .
 
-
 # Exposer le port 3000
 EXPOSE 3000
 
