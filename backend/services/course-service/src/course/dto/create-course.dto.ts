@@ -32,4 +32,10 @@ export class CreateCourseDto {
 
   @IsString()
   image: string;
+
+  @IsString()
+  apercu: string;
+
+  @IsString()
+  color: string;
 }

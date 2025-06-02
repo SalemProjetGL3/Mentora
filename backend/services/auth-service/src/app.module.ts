@@ -14,7 +14,6 @@ import { TypeOrmModuleOptions } from '@nestjs/typeorm';
       envFilePath: [
         join(__dirname, '../../../.env'),
         join(__dirname, '../.env'),
-        join(__dirname, '../../.env'),
       ],
       load: [sessionConfig],
     }),
