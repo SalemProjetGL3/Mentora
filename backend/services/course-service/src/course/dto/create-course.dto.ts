@@ -3,6 +3,7 @@ import { Type } from 'class-transformer';
 import { CreateModuleDto } from './create-module.dto';
 
 export class CreateCourseDto {
+  @IsOptional()
   @IsNumber()
   id: number;
 

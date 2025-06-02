@@ -12,8 +12,8 @@ export class Lesson {
   @Prop()
   content?: string;
 
-  @Prop({ required: true, enum: ['video', 'text', 'code', 'quiz'] })
-  type: 'video' | 'text' | 'code' | 'quiz';
+  @Prop({ required: true, enum: ['video', 'text', 'image', 'quiz'] })
+  type: 'video' | 'text' | 'image' | 'quiz';
 
   @Prop()
   description?: string;

@@ -8,15 +8,35 @@ import { UpdateCourseDto } from './dto/update-course.dto';
 import { CreateModuleDto } from './dto/create-module.dto';
 import { UpdateModuleDto } from './dto/update-module.dto';
 import { CreateLessonDto } from './dto/create-lesson.dto';
+import { IdGeneratorService } from 'src/shared/id-generator.service';
 
 @Injectable()
 export class CourseService {
   constructor(
     @InjectModel(Course.name) private courseModel: Model<CourseDocument>,
+    private idGeneratorService: IdGeneratorService,
   ) {}
 
+
   async create(dto: CreateCourseDto): Promise<Course> {
-    const created = new this.courseModel(dto);
+    const courseId = await this.idGeneratorService.getNextId('courses');
+    const courseData = {
+      ...dto,
+      id: courseId,
+      modules: await Promise.all(
+        (dto.modules?.map(async (module, i) => ({
+          ...module,
+          id: await this.idGeneratorService.getNextId('modules'),
+          lessons: await Promise.all(
+            (module.lessons?.map(async (lesson, j) => ({
+              ...lesson,
+              id: await this.idGeneratorService.getNextId('lessons'),
+            })) || [])
+          ),
+        })) || [])
+      ),
+    };
+    const created = new this.courseModel(courseData);
     return created.save();
   }
 
@@ -58,8 +78,12 @@ export class CourseService {
     }
 
     course.modules.push({
-      title: dto.title,
-      lessons: dto.lessons || [],
+      ...dto,
+      id: await this.idGeneratorService.getNextId('modules'),
+      lessons: await Promise.all((dto.lessons?.map(async lesson => ({
+        ...lesson,
+        id: await this.idGeneratorService.getNextId('lessons'),
+      })) || [])),
     });
 
     await course.save();
@@ -121,7 +145,11 @@ export class CourseService {
       throw new NotFoundException(`Module #${moduleId} not found in course #${courseId}`);
     }
   
-    module.lessons.push(lessonDto);
+     module.lessons.push({
+      ...lessonDto,
+      id: await this.idGeneratorService.getNextId('lessons'),
+    });
+
     await course.save();
     return course;
   }

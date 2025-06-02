@@ -1,14 +1,15 @@
 import { IsString, IsOptional, IsBoolean, IsEnum, IsNumber, IsArray } from 'class-validator';
 
 export class CreateLessonDto {
+  @IsOptional()
   @IsNumber()
   id: number;
 
   @IsString()
   title: string;
 
-  @IsEnum(['video', 'text', 'code', 'quiz'])
-  type: 'video' | 'text' | 'code' | 'quiz';
+  @IsEnum(['video', 'text', 'image', 'quiz'])
+  type: 'video' | 'text' | 'image' | 'quiz';
 
   @IsOptional()
   @IsString()
