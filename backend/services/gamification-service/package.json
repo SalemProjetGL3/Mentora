@@ -26,6 +26,8 @@
     "@nestjs/event-emitter": "^3.0.1",
     "@nestjs/mongoose": "^11.0.3",
     "@nestjs/platform-express": "^11.0.1",
+    "auth-utils": "file:../../libs/auth-utils",
+    "cookie-parser": "^1.4.7",
     "gamification-service": "file:",
     "mongoose": "^8.13.2",
     "reflect-metadata": "^0.2.2",
