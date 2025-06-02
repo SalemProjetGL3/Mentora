@@ -6,13 +6,18 @@ import { ApolloDriver, ApolloDriverConfig } from '@nestjs/apollo';
 import { UserModule } from './user/user.module';
 import { User } from './user/user.entity';
 import { join } from 'path';
+import { AuthUtilsModule } from 'auth-utils';
 
 @Module({
   imports: [
     ConfigModule.forRoot({
       isGlobal: true,
-      envFilePath: join(__dirname, '../../../.env'),
+      envFilePath: [
+        join(__dirname, '../../../.env'),
+        join(__dirname, '../.env')
+      ],
     }),
+    AuthUtilsModule,
     TypeOrmModule.forRootAsync({
       imports: [ConfigModule],
       useFactory: (configService: ConfigService) => ({
@@ -30,6 +35,7 @@ import { join } from 'path';
     GraphQLModule.forRoot<ApolloDriverConfig>({
       driver: ApolloDriver,
       autoSchemaFile: true,
+      csrfPrevention: false,
     }),
     UserModule,
   ],

@@ -14,7 +14,7 @@ import { User } from 'src/users/user.entity';
 
 @Module({
   imports: [
-    // ConfigModule,
+    ConfigModule,
     PassportModule.register({ session: true }),
     JwtModule.registerAsync({
       imports: [ConfigModule],

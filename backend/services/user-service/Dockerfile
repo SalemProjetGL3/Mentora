@@ -1,18 +1,33 @@
-# Utilise une image Node.js
-FROM node:22
+# Use the lightweight Node image
+FROM node:22-alpine
 
-# Définir le dossier de travail
+# Set the working directory
 WORKDIR /usr/src/app
 
-# Copier package.json et installer les dépendances
-COPY package*.json ./
+# Copy package.json for the shared lib (for caching)
+COPY libs/auth-utils/package*.json ./libs/auth-utils/
+
+# Copy package.json for the user-service (for caching)
+COPY services/user-service/package*.json ./services/user-service/
+
+# Copy source code
+COPY services/user-service ./services/user-service
+COPY libs/auth-utils ./libs/auth-utils
+
+# Build the shared library
+WORKDIR /usr/src/app/libs/auth-utils
+RUN npm install -g @nestjs/cli
 RUN npm install
+RUN npm run build
 
-# Copier le reste du code
-COPY . .
+# Build the user-service
+WORKDIR /usr/src/app/services/user-service
+RUN npm install -g @nestjs/cli
+RUN npm install
+RUN npm run build
 
-# Exposer le port 3000
-EXPOSE 3000
+# Expose the port your service uses (assume 3001 for user-service)
+EXPOSE 3001
 
-# Démarrer l'application
+# Start the application
 CMD ["npm", "run", "start"]
