@@ -1,17 +1,17 @@
 FROM node:22-alpine
 
-# Définir le dossier de travail
 WORKDIR /usr/src/app
 
-# Copier package.json et installer les dépendances
-COPY package*.json ./
+# Copy package files from the quiz-service directory
+COPY services/quiz-service/package*.json ./
+RUN npm install -g @nestjs/cli
+RUN npm install
 
-# Copier le reste du codeAdd commentMore actions
-COPY . .
+# Copy source code from quiz-service directory
+COPY services/quiz-service/ ./
 
-
-# Exposer le port 3000
+# Expose port
 EXPOSE 3000
 
-# Démarrer l'application
-CMD ["npm", "run", "start"]
+# Start the application
+CMD ["npm", "run", "start:dev"]
