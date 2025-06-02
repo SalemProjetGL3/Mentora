@@ -16,7 +16,7 @@ import { ShopModule } from './shop/shop.module';
       ConfigModule.forRoot({
       isGlobal: true,
         envFilePath: [
-          join(__dirname, '../../.env'),
+          join(__dirname, '../../../.env'),
           join(__dirname, '../.env'),
         ]
       }),
