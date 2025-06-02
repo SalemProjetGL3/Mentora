@@ -1,18 +1,19 @@
-# Base image
+# Utilise une image Node.js
 FROM node:22-alpine
 
-# Set working directory
+# Définir le dossier de travail
 WORKDIR /usr/src/app
 
-# Copy auth-service package files first for caching
-COPY services/auth-service/package*.json ./services/auth-service/
+# Copier package.json et installer les dépendances
+COPY package*.json ./
+
 
 # Copy shared library package files for caching
 COPY libs/auth-utils/package*.json ./libs/auth-utils/
 
 # Copy all remaining source code
 WORKDIR /usr/src/app
-COPY services/auth-service ./services/auth-service
+COPY services/gamification-service ./services/gamification-service
 COPY libs/auth-utils ./libs/auth-utils
 
 # Build the shared library
@@ -21,14 +22,14 @@ RUN npm install -g @nestjs/cli
 RUN npm install
 RUN npm run build
 
-# Build auth-service if needed
-WORKDIR /usr/src/app/services/auth-service
+# Build gamification-service if needed
+WORKDIR /usr/src/app/services/gamification-service
 RUN npm install -g @nestjs/cli
 RUN npm install
 RUN npm run build
 
-# Expose port
+# Exposer le port 3000
 EXPOSE 3000
 
-# Start app
+# Démarrer l'application
 CMD ["npm", "run", "start"]

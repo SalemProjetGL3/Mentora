@@ -19,7 +19,6 @@ export default function LeaderboardPage() {
         fetch('http://localhost:3000/leaderboard') // Use proxy or full URL
         .then((res) => res.json())
         .then((data) => {
-            console.log(data)
             setPlayers(data);
         })
         .catch((err) => console.error('Failed to fetch leaderboard:', err));

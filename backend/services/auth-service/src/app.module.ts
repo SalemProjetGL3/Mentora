@@ -13,7 +13,7 @@ import { TypeOrmModuleOptions } from '@nestjs/typeorm';
       isGlobal: true,
       envFilePath: [
         join(__dirname, '../../../.env'),
-        join(__dirname, '../.env'),
+        join(__dirname, '../.env')
       ],
       load: [sessionConfig],
     }),

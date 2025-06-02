@@ -8,7 +8,11 @@ export class JwtStrategy extends PassportStrategy(Strategy) {
   constructor() {
     super({
       jwtFromRequest: ExtractJwt.fromExtractors([
-        (req: Request) => req?.cookies?.token, // Explicitly type `req`
+        (req: Request) => {
+          const token = req?.cookies?.token;
+          console.log('Received token:', token); // Log the token
+          return token;
+        },
       ]),
       ignoreExpiration: false,
       secretOrKey: process.env.JWT_SECRET || 'defaultSecret', // Ensure secretOrKey is a string
@@ -16,6 +20,7 @@ export class JwtStrategy extends PassportStrategy(Strategy) {
   }
 
   async validate(payload: any) {
-    return { email: payload.email, username: payload.username, role: payload.role };
+    console.log('Decrypted payload:', payload); 
+    return { id: payload.sub, email: payload.email, username: payload.username, role: payload.role };
   }
 }

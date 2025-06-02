@@ -7,11 +7,11 @@ import { AuthUtilsModule } from 'auth-utils';
 
 @Module({
   imports: [
-    AuthUtilsModule, // Importing AuthUtilsModule for JWT and roles decorators
+    AuthUtilsModule,
     TypeOrmModule.forFeature([User])
   ],
   providers: [UsersService],
   controllers: [UsersController],
-  exports: [UsersService], // Exporting for use in AuthModule
+  exports: [UsersService],
 })
 export class UsersModule {}

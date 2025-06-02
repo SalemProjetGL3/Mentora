@@ -19,7 +19,7 @@ export class User {
     enum: ['USER', 'ADMIN'],
     default: 'USER'
   })
-  role: string;
+  role: string = 'USER';
 
   @Column({ nullable: true })
   firstName?: string;
