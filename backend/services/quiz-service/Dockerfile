@@ -1,14 +1,14 @@
-# Utilise une image Node.js
+# Utilise une image Node.js ORIGINAL
 FROM node:22-alpine
 
 # Définir le dossier de travail
 WORKDIR /usr/src/app
 
-# Copier package.json et installer les dépendances
-COPY package*.json ./
-
 # Copy shared library package files for caching
 COPY libs/auth-utils/package*.json ./libs/auth-utils/
+
+# Copier package.json et installer les dépendances
+COPY package*.json ./
 
 # Copy all remaining source code
 WORKDIR /usr/src/app
@@ -26,9 +26,6 @@ WORKDIR /usr/src/app/services/quiz-service
 RUN npm install -g @nestjs/cli
 RUN npm install
 RUN npm run build
-
-# Copier le reste du code
-COPY . .
 
 # Exposer le port 3000
 EXPOSE 3000
