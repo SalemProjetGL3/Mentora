@@ -4,6 +4,8 @@ import { ShopService } from './shop.service';
 import { MongooseModule } from '@nestjs/mongoose';
 import { ShopItem, ShopItemSchema } from './schema/shop-item.schema';
 import { UserInventory, UserInventorySchema } from './schema/user-inventory.schema';
+import { AuthUtilsModule } from 'auth-utils';
+
 
 @Module({
     imports: [
@@ -12,6 +14,7 @@ import { UserInventory, UserInventorySchema } from './schema/user-inventory.sche
         { name: UserInventory.name, schema: UserInventorySchema }, 
         { name: 'UserRewards', schema: UserInventorySchema }, // Assuming UserRewards schema is similar to UserInventory
       ]),
+      AuthUtilsModule, // Import AuthUtilsModule for JWT and roles guards
     ],
   controllers: [ShopController],
   providers: [ShopService]

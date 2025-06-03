@@ -29,18 +29,6 @@ import { TypeOrmModuleOptions } from '@nestjs/typeorm';
         const password = config.get<string>('DB_PASSWORD');
         const database = config.get<string>('DB_NAME');
 
-        // Validate required configuration
-        if (!host || !port || !username || !password || !database) {
-          throw new Error(
-            `Database configuration error. Missing required values:
-            Host: ${host ? '✓' : '✗'}
-            Port: ${port ? '✓' : '✗'}
-            Username: ${username ? '✓' : '✗'}
-            Password: ${password ? '✓' : '✗'}
-            Database: ${database ? '✓' : '✗'}`
-          );
-        }
-
         // Create and return the database configuration
         const dbConfig: TypeOrmModuleOptions = {
           type: 'mysql',

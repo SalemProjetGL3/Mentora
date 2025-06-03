@@ -6,6 +6,8 @@ import { CourseService } from './course.service';
 import { Course, CourseSchema } from './schemas/course.schema';
 import { IdGeneratorService } from '../shared/id-generator.service';
 import { Counter, CounterSchema } from '../shared/schemas/counter.schema';
+import { AuthUtilsModule } from 'auth-utils';
+
 
 @Module({
   imports: [
@@ -13,6 +15,7 @@ import { Counter, CounterSchema } from '../shared/schemas/counter.schema';
       { name: Course.name, schema: CourseSchema },
       { name: Counter.name, schema: CounterSchema },
     ]),
+    AuthUtilsModule, // Import AuthUtilsModule for JWT and roles guards
   ],
   controllers: [CourseController],
   providers: [CourseService, IdGeneratorService],

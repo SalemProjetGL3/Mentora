@@ -1,7 +1,9 @@
-import { Controller, Get, Sse } from '@nestjs/common';
+import { Controller, Get, Sse, UseGuards } from '@nestjs/common';
 import { LeaderboardService } from './leaderboard.service';
 import { map, Observable } from 'rxjs';
+import { JwtAuthGuard } from 'auth-utils';
 
+@UseGuards(JwtAuthGuard)
 @Controller('leaderboard')
 export class LeaderboardController {
     constructor(private readonly leaderboardService: LeaderboardService) {}
