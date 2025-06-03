@@ -1,5 +1,5 @@
 // course.controller.ts
-import { Controller, Get, Post, Body, Param, Patch, Delete } from '@nestjs/common';
+import { Controller, Get, Post, Body, Param, Patch, Delete, ParseIntPipe } from '@nestjs/common';
 import { CourseService } from './course.service';
 import { CreateCourseDto } from './dto/create-course.dto';
 import { UpdateCourseDto } from './dto/update-course.dto';
@@ -22,24 +22,24 @@ export class CourseController {
   }
 
   @Get(':id')
-  findOne(@Param('id') id: string) {
+  findOne(@Param('id', ParseIntPipe) id: number) {
     return this.courseService.findOne(id);
   }
 
   @Patch(':id')
-  update(@Param('id') id: string, @Body() dto: UpdateCourseDto) {
+  update(@Param('id', ParseIntPipe) id: number, @Body() dto: UpdateCourseDto) {
     return this.courseService.update(id, dto);
   }
 
   @Delete(':id')
-  remove(@Param('id') id: string) {
+  remove(@Param('id', ParseIntPipe) id: number) {
     return this.courseService.remove(id);
   }
 
   // --- Modules Management ---
   @Post(':courseId/modules')
   addModule(
-    @Param('courseId') courseId: string,
+    @Param('courseId', ParseIntPipe) courseId: number,
     @Body() dto: CreateModuleDto,
   ) {
     return this.courseService.addModule(courseId, dto);
@@ -47,8 +47,8 @@ export class CourseController {
 
   @Patch(':courseId/modules/:moduleId')
   updateModule(
-    @Param('courseId') courseId: string,
-    @Param('moduleId') moduleId: string,
+    @Param('courseId', ParseIntPipe) courseId: number,
+    @Param('moduleId', ParseIntPipe) moduleId: number,
     @Body() dto: UpdateModuleDto,
   ) {
     return this.courseService.updateModule(courseId, moduleId, dto);
@@ -56,8 +56,8 @@ export class CourseController {
 
   @Delete(':courseId/modules/:moduleId')
   removeModule(
-    @Param('courseId') courseId: string,
-    @Param('moduleId') moduleId: string,
+    @Param('courseId', ParseIntPipe) courseId: number,
+    @Param('moduleId', ParseIntPipe) moduleId: number,
   ) {
     return this.courseService.removeModule(courseId, moduleId);
   }
@@ -65,8 +65,8 @@ export class CourseController {
   // --- Lessons Management ---
   @Post(':courseId/modules/:moduleId/lessons')
   addLessonToModule(
-    @Param('courseId') courseId: string,
-    @Param('moduleId') moduleId: string,
+    @Param('courseId', ParseIntPipe) courseId: number,
+    @Param('moduleId', ParseIntPipe) moduleId: number,
     @Body() dto: CreateLessonDto,
   ) {
     return this.courseService.addLessonToModule(courseId, moduleId, dto);
@@ -74,9 +74,9 @@ export class CourseController {
 
   @Delete(':courseId/modules/:moduleId/lessons/:lessonId')
   removePageFromLesson(
-    @Param('courseId') courseId: string,
-    @Param('moduleId') moduleId: string,
-    @Param('lessonId') lessonId: string,
+    @Param('courseId', ParseIntPipe) courseId: number,
+    @Param('moduleId', ParseIntPipe) moduleId: number,
+    @Param('lessonId', ParseIntPipe) lessonId: number,
   ) {
     return this.courseService.removeLessonFromModule(courseId, moduleId, lessonId);
   }

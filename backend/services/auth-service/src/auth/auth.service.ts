@@ -103,12 +103,12 @@ export class AuthService {
     }
 
     const payload = { 
-  id: user.id,                  
-  username: user.username, 
-  email: user.email,
-  role: user.role,              
-};
-console.log('[AUTH SERVICE] JWT_SECRET used for signing:', this.configService.get('JWT_SECRET'));
+      id: user.id,                  
+      username: user.username, 
+      email: user.email,
+      role: user.role,              
+    };
+    console.log('[AUTH SERVICE] JWT_SECRET used for signing:', this.configService.get('JWT_SECRET'));
 
     const token = this.jwtService.sign(payload);
 

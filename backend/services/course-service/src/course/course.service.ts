@@ -44,17 +44,17 @@ export class CourseService {
     return this.courseModel.find().exec();
   }
 
-  async findOne(id: string): Promise<Course> {
-    const course = await this.courseModel.findOne({ id: Number(id) }).exec();
+  async findOne(id: number): Promise<Course> {
+    const course = await this.courseModel.findOne({ id }).exec();
     if (!course) {
       throw new NotFoundException(`Course #${id} not found`);
     }
     return course;
   }
 
-  async update(id: string, dto: UpdateCourseDto): Promise<Course> {
+  async update(id: number, dto: UpdateCourseDto): Promise<Course> {
     const updated = await this.courseModel
-      .findOneAndUpdate({ id: Number(id) }, dto, { new: true })
+      .findOneAndUpdate({ id }, dto, { new: true })
       .exec();
     if (!updated) {
       throw new NotFoundException(`Course #${id} not found`);
@@ -62,8 +62,8 @@ export class CourseService {
     return updated;
   }
 
-  async remove(id: string): Promise<void> {
-    const result = await this.courseModel.findOneAndDelete({ id: Number(id) }).exec();
+  async remove(id: number): Promise<void> {
+    const result = await this.courseModel.findOneAndDelete({ id }).exec();
     if (!result) {
       throw new NotFoundException(`Course #${id} not found`);
     }
@@ -71,8 +71,8 @@ export class CourseService {
 
 
   // --- Modules Management ---
-  async addModule(courseId: string, dto: CreateModuleDto): Promise<Course> {
-    const course = await this.courseModel.findOne({ id: Number(courseId) }).exec();
+  async addModule(courseId: number, dto: CreateModuleDto): Promise<Course> {
+    const course = await this.courseModel.findOne({ id: courseId }).exec();
     if (!course) {
       throw new NotFoundException(`Course #${courseId} not found`);
     }
@@ -91,14 +91,14 @@ export class CourseService {
   }
 
   
-  async updateModule(courseId: string, moduleId: string, dto: UpdateModuleDto): Promise<Course> {
-    const course = await this.courseModel.findOne({ id: Number(courseId) }).exec();
+  async updateModule(courseId: number, moduleId: number, dto: UpdateModuleDto): Promise<Course> {
+    const course = await this.courseModel.findOne({ id: courseId }).exec();
     if (!course) {
       throw new NotFoundException(`Course #${courseId} not found`);
     }
 
     // Trouver la lesson correspondante dans le tableau
-    const module = course.modules.find(m => m.id === Number(moduleId));
+    const module = course.modules.find(m => m.id === moduleId);
     if (!module) {
       throw new NotFoundException(`Module #${moduleId} not found in course #${moduleId}`);
     }
@@ -116,14 +116,14 @@ export class CourseService {
   }
 
   
-  async removeModule(courseId: string, moduleId: string): Promise<Course> {
-    const course = await this.courseModel.findOne({ id: Number(courseId) }).exec();
+  async removeModule(courseId: number, moduleId: number): Promise<Course> {
+    const course = await this.courseModel.findOne({ id: courseId }).exec();
     if (!course) {
       throw new NotFoundException(`Course #${courseId} not found`);
     }
 
     // On cherche le module
-    const module = course.modules.find(m => m.id === Number(moduleId));
+    const module = course.modules.find(m => m.id === moduleId);
     if (!module) {
       throw new NotFoundException(`Module #${moduleId} not found in course #${courseId}`);
     }
@@ -134,13 +134,13 @@ export class CourseService {
   }
 
   // --- Lessons Management ---
-  async addLessonToModule(courseId: string, moduleId: string, lessonDto: CreateLessonDto): Promise<Course> {
-    const course = await this.courseModel.findOne({ id: Number(courseId) }).exec();
+  async addLessonToModule(courseId: number, moduleId: number, lessonDto: CreateLessonDto): Promise<Course> {
+    const course = await this.courseModel.findOne({ id: courseId }).exec();
     if (!course) {
       throw new NotFoundException(`Course #${courseId} not found`);
     }
   
-    const module = course.modules.find(m => m.id === Number(moduleId));
+    const module = course.modules.find(m => m.id === moduleId);
     if (!module) {
       throw new NotFoundException(`Module #${moduleId} not found in course #${courseId}`);
     }
@@ -154,18 +154,18 @@ export class CourseService {
     return course;
   }
 
-  async removeLessonFromModule(courseId: string, moduleId: string, lessonId: string): Promise<Course> {
-    const course = await this.courseModel.findOne({ id: Number(courseId) }).exec();
+  async removeLessonFromModule(courseId: number, moduleId: number, lessonId: number): Promise<Course> {
+    const course = await this.courseModel.findOne({ id: courseId }).exec();
     if (!course) {
       throw new NotFoundException(`Course #${courseId} not found`);
     }
   
-    const module = course.modules.find(m => m.id === Number(moduleId));
+    const module = course.modules.find(m => m.id === moduleId);
     if (!module) {
-      throw new NotFoundException(`Module #${lessonId} not found in course #${courseId}`);
+      throw new NotFoundException(`Module #${moduleId} not found in course #${courseId}`);
     }
   
-    const lesson = module.lessons.find(l => l.id === Number(lessonId));
+    const lesson = module.lessons.find(l => l.id === lessonId);
     if (!lesson) {
       throw new NotFoundException(`Lesson #${lessonId} not found in module #${moduleId}`);
     }

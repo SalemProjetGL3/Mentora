@@ -62,6 +62,8 @@ services:
       context: .
       dockerfile: services/course-service/Dockerfile
     container_name: course_service
+    env_file:
+      - ./.env
     ports:
       - "3003:3000"
     environment:
@@ -74,6 +76,8 @@ services:
       context: .
       dockerfile: services/quiz-service/Dockerfile
     container_name: quiz_service
+    env_file:
+      - ./.env
     ports:
       - "3004:3000"
     environment:
@@ -81,17 +85,19 @@ services:
     depends_on:
       - mongo
 
-  gamification-service:
-    build: 
-      context: .
-      dockerfile: services/gamification-service/Dockerfile
-    container_name: gamification_service
-    ports:
-      - "3009:3000"
-    environment:
-      - MONGO_URI=${MONGO_URI}
-    depends_on:
-      - mongo
+  # gamification-service:
+  #   build: 
+  #     context: .
+  #     dockerfile: services/gamification-service/Dockerfile
+  #   container_name: gamification_service
+  #   env_file:
+  #     - ./.env
+  #   ports:
+  #     - "3009:3000"
+  #   environment:
+  #     - MONGO_URI=${MONGO_URI}
+  #   depends_on:
+  #     - mongo
 
   # roadmap-service:
   #   build: ./services/roadmap-service

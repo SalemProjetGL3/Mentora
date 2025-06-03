@@ -25,8 +25,9 @@ export class ShopService {
         }
         return shopItem;
     }
-    async getUserInventory(userId: string): Promise<UserInventory> {
-        const userInventory = await this.userInventoryModel.findOne({ userId }).exec();
+    async getUserInventory(userId: number): Promise<UserInventory> {
+        const userInventory = await this.userInventoryModel.findOne({ userId: String(userId) }).exec();
+        console.log('[shop] User Inventory:', userInventory);
         if (!userInventory) {
             throw new Error(`User inventory for userId ${userId} not found`);
         }
@@ -43,7 +44,7 @@ export class ShopService {
         }
         return deletedItem;
     }
-    async buyShopItem(itemId: number, userId: number): Promise<UserInventory> {
+    async buyShopItem(itemId: number, userId: string): Promise<UserInventory> {
         const shopItem = await this.shopItemModel.findOne({ itemId }).exec();
         if (!shopItem) {
             throw new Error(`Shop item with id ${itemId} not found`);
@@ -51,7 +52,10 @@ export class ShopService {
         const userInventory = await this.userInventoryModel.findOne({ userId }).exec();
         const userRewards = await this.userRewardsModel.findOne({ userId}).exec();
         if (!userInventory) {
-            throw new Error(`User inventory for userId ${userId} not found`);
+            console.log(`User inventory for userId ${userId} not found. Creating new inventory.`);
+            const newInventory = new this.userInventoryModel({ userId, ownedItems: [] });
+            await newInventory.save();
+            return this.buyShopItem(itemId, userId); // Retry after creating inventory
         }
         if (!userRewards) {
             throw new Error(`User rewards for userId ${userId} not found`);
