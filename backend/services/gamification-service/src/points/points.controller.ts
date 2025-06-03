@@ -1,6 +1,7 @@
-import { Body, Controller, Get, Param, Post } from '@nestjs/common';
+import { BadRequestException, Body, Controller, Get, Param, Post, Req, UseGuards } from '@nestjs/common';
 import { PointsService } from './points.service';
 import { UpdatePointsDto } from './dto/update-points.dto';
+import { JwtAuthGuard, User } from 'auth-utils';
 
 @Controller('points')
 export class PointsController {
@@ -10,10 +11,13 @@ export class PointsController {
     updatePoints(@Body() body: UpdatePointsDto) {
       return this.pointsService.addPoints(body.userId, body.type);
     }
- 
-    @Get(':userId')
-    getUserPoints(@Param('userId') userId: string) {
-        return this.pointsService.getUserPoints(Number(userId));
+    @Get()
+    @UseGuards(JwtAuthGuard)
+    getUserPoints(@User('id') userId: number) {
+      if (!userId) {
+        throw new BadRequestException('User ID is missing');
+      }
+      return this.pointsService.getUserPoints(Number(userId));
     }
 }
     

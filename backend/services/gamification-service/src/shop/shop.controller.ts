@@ -1,34 +1,36 @@
-import { Body, Controller, Delete, Get, Param, Post } from '@nestjs/common';
+import { Body, Controller, Delete, Get, Param, Post, Req, UseGuards, BadRequestException, ParseIntPipe } from '@nestjs/common';
 import { ShopService } from './shop.service';
 import { ShopItem } from './schema/shop-item.schema';
-import { UserRewards } from 'src/points/schemas/user-rewards.schema';
+import { JwtAuthGuard, User } from 'auth-utils';
 
 @Controller('shop')
 export class ShopController {
     constructor(private readonly shopService: ShopService) {}
+    @Get('user')
+    @UseGuards(JwtAuthGuard)
+    getUserInventory(@User('id', ParseIntPipe) userId: number) {
+        console.log('[shop] User ID from decorator:', userId);
+        return this.shopService.getUserInventory(userId);
+    }
+    @Get(':id')
+    getShopItemById(@Param('id', ParseIntPipe) itemId: number) {
+        return this.shopService.getShopItemById(itemId);
+    }
     @Get()
     getShopItems() {
         return this.shopService.getShopItems();
     }
-    @Get(':id')
-    getShopItemById(@Param('id') itemId: number) {
-        return this.shopService.getShopItemById(+itemId);
-    }
-    @Get('user/:userId')
-    getUserInventory(@Param('userId') userId: string) {
-        return this.shopService.getUserInventory(userId);
-    }
     @Delete(':id')
-    deleteShopItem(@Param('id') itemId: number) {
-        return this.shopService.deleteShopItem(+itemId);
+    deleteShopItem(@Param('id', ParseIntPipe) itemId: number) {
+        return this.shopService.deleteShopItem(itemId);
     }
     @Post('add')
     addShopItem(@Body() item: Partial<ShopItem>) {
         return this.shopService.addShopItem(item);
     }
     @Post('buy/:itemId')
-    buyShopItem(@Param('itemId') itemId: number, @Body('userId') userId: number) {
-        return this.shopService.buyShopItem(+itemId, userId);
+    @UseGuards(JwtAuthGuard)
+    buyShopItem(@Param('itemId', ParseIntPipe) itemId: number, @User('id') userId: string) {
+        return this.shopService.buyShopItem(itemId, userId);
     }
-
 }

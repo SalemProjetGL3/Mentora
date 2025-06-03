@@ -32,6 +32,7 @@
     "cookie-parser": "^1.4.7",
     "course-service": "file:",
     "mongoose": "^8.13.0",
+    "quiz-service": "file:",
     "reflect-metadata": "^0.2.2",
     "rxjs": "^7.8.1"
   },

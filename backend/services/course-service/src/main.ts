@@ -7,6 +7,7 @@ async function bootstrap() {
   app.enableCors({
     origin: 'http://localhost:2000', 
     methods: ['GET', 'POST'],
+    credentials:true
   });
   app.use(cookieParser());
   await app.listen(process.env.PORT ?? 3000);
